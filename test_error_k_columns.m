@@ -33,8 +33,7 @@ E2(5:12) = 2*err*ones(8,1);
 
 E3 = zeros(20,1);
 E3(5:12) = 3*err*ones(8,1);
-EJ = [E1 E2 E3
-    ];
+EJ = [E1 E2 E3];
 
 ne = norm(EJ,'fro')^2;
 nc = norm(C,'fro')^2;
