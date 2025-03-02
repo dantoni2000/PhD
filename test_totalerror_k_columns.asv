@@ -2,7 +2,7 @@
 %on best error E: the parallel one! 
 
 clear all, close all
-err=1e-02;
+err=1e-04;
 n=1000;
 
 C1 = [ones(n,1); -ones(n,1)];
@@ -37,6 +37,6 @@ npf = norm(EJ,'fro')^2*norm(pinv(C)*A,'fro')^2;
 %controllo finale :)
 n1 = norm(A-(CE)*pinv(CE)*(A+E),'fro')^2;
 
-%n2 = npf*(nc^2 + nej*nc)/(nc^2 + 2*nej*nc +nej^2) + (2*n-3)/(2*n)*ne + nej^2*(nc + nej)/(nc^2 + 2*nej*nc +nej^2);
+n2 = npf*(nc^2 + nej*nc)/(nc^2 + 2*nej*nc +nej^2) + (2*n-3)/(2*n)*ne + nej^2*(nc + nej)/(nc^2 + 2*nej*nc +nej^2);
 
-n2 = npf + ne;
+%n2 = npf + ne;
