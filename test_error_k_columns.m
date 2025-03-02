@@ -1,6 +1,5 @@
 %test 27 02 2025
 %on best error Ej: the orthogonal one! 
-%Hence, given C, properly choose two indeces of C and switch them and their sign!
 
 % C = [ones(10,1); zeros(10,1)];
 % 

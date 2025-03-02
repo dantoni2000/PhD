@@ -24,12 +24,12 @@ conf = ne*(nc^2 + ne*nc)/(nc^2 + 2*ne*nc +ne^2);
 trueness = conf - comp;
 
 
-C = [ones(10,1); -ones(10,1)];
-
-E2j = err*zeros(20,1); E2j(10,1)=1; E2j(11,1)=1;
-E2j = E2j*ne/norm(E2j);
-
-nc = norm(C)^2;
-comp2 = norm((eye(20,20)-(C+Ej)*pinv(C+Ej))*Ej)^2;
-conf2 = ne*(nc^2 + ne*nc)/(nc^2 + 2*ne*nc +ne^2);
-trueness2 = conf - comp;
+% C = [ones(10,1); -ones(10,1)];
+% 
+% E2j = err*zeros(20,1); E2j(10,1)=1; E2j(11,1)=1;
+% E2j = E2j*ne/norm(E2j);
+% 
+% nc = norm(C)^2;
+% comp2 = norm((eye(20,20)-(C+Ej)*pinv(C+Ej))*Ej)^2;
+% conf2 = ne*(nc^2 + ne*nc)/(nc^2 + 2*ne*nc +ne^2);
+% trueness2 = conf - comp;

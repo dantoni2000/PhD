@@ -1,5 +1,5 @@
 %test 21 02 2025
-%on best error E: the parallel one! [Works well in practice] 
+%on best error E: the parallel one! 
 
 clear all, close all
 err=1e-04;
