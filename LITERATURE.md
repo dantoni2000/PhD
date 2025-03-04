@@ -10,4 +10,4 @@ Kumar, Schneider - Literature survey on low rank approximation of matrices. http
 
 Martinsson, Tropp - Randomized numerical linear algebra: Foundations and algorithms. doi:10.1017/S0962492920000021
 
-Murray etal - Randomized Numerical Linear Algebra A Perspective on the Field With an Eye to Software https://doi.org/10.48550/arXiv.2302.11474
+Murray etal - Randomized Numerical Linear Algebra A Perspective on the Field With an Eye to Software. https://doi.org/10.48550/arXiv.2302.11474
