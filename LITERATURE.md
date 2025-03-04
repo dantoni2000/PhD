@@ -9,3 +9,5 @@ Dong, Martinsson - Simpler is better: a comparative study of randomized pivoting
 Kumar, Schneider - Literature survey on low rank approximation of matrices. https://doi.org/10.48550/arXiv.1606.06511
 
 Martinsson, Tropp - Randomized numerical linear algebra: Foundations and algorithms. doi:10.1017/S0962492920000021
+
+Murray etal - Randomized Numerical Linear Algebra A Perspective on the Field With an Eye to Software https://doi.org/10.48550/arXiv.2302.11474
