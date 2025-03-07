@@ -1,0 +1,24 @@
+ added files
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+#
+# Initial commit
+#
+# Changes to be committed:
+#	new file:   TEST_RANGO.m
+#	new file:   mapping_error.m
+#	new file:   rank_1.m
+#	new file:   rank_1noise.m
+#	new file:   test_columnselection.m
+#	new file:   test_error.m
+#	new file:   test_error_k_columns.m
+#	new file:   test_error_rank_s.m
+#	new file:   test_totalerror.m
+#	new file:   test_totalerror_k_columns.m
+#	new file:   test_totalerror_rank_s.m
+#
+# Untracked files:
+#	.DS_Store
+#
