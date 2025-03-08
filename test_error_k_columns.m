@@ -10,11 +10,7 @@
 % comp((j-8)/2) = norm((eye(20,20)-(C+Ej)*pinv(C+Ej))*Ej)^2;
 % end
 
-<<<<<<< HEAD
-err=1e-0;
-=======
 err = 1e-04;
->>>>>>> 1d5be9a (initial commit)
 
 C1 = zeros(20,1);
 C1(1) = 1;

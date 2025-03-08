@@ -1,10 +1,6 @@
 %test 27 02 2025
-<<<<<<< HEAD
 %on best error Ej for rank A>1. By now, it works only if c1 is orthogonal to c2, in this case e1=eps*c2, e2=eps*c1.
-=======
 %on best error Ej for rank A>1. By now, it works only if c1 is orthogonal to c2, in this case [e1 e2] orthogonal to [c1 c2].
->>>>>>> 1d5be9a (initial commit)
-
 
 err=1e-0;
 
@@ -14,11 +10,9 @@ C1(2) = -1;
 C2 = zeros(20,1);
 C2(3) = 1;
 C2(4) = -1;
-<<<<<<< HEAD
 C3 = zeros(20,1);
 C3(1) = 1;
 C3(2) = 1;
-=======
 
 C3 = zeros(20,1);
 C3(1) = 1;
@@ -26,7 +20,6 @@ C3(2) = -1;
 C3(3) = 1;
 C3(4) = -1;
 
->>>>>>> 1d5be9a (initial commit)
 C = [C1 C2 C3];
 
 
@@ -36,13 +29,10 @@ E1(1:2) = err*ones(2,1);
 E2 = zeros(20,1);
 E2(3:4) = err*ones(2,1);
 
-<<<<<<< HEAD
 E3 = zeros(20,1);
 E3 = err*C1;
-=======
 %E3 = zeros(20,1);
 E3 = err*(E1+E2);
->>>>>>> 1d5be9a (initial commit)
 
 EJ = [E1 E2 E3];
 

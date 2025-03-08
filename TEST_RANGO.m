@@ -4,11 +4,8 @@
 clear all, close all
 err = 1e-02;
 n = 1000;
-<<<<<<< HEAD
 s = 40;
-=======
-s = 20;
->>>>>>> 1d5be9a (initial commit)
+
 
 CEJ = randn(1000,2*s);
 [Q,R] = qr(CEJ,'econ');
@@ -46,12 +43,9 @@ n1 = norm(A-(CE)*pinv(CE)*(A+E),'fro')^2;
 
 n2 = npf*(nc^2 + nej*nc)/(nc^2 + 2*nej*nc +nej^2) + (2*n-s)/(2*n)*ne + nej^2*(nc + nej)/(nc^2 + 2*nej*nc +nej^2);
 
-<<<<<<< HEAD
-%n2 = npf + ne;
-=======
+
 %n2 = npf + ne;
 
 % RR=R(1:s,1:s)'*R(1:s,1:s);
 % G=RR^-1 * trace(RR);
 % eigs(G);
->>>>>>> 1d5be9a (initial commit)

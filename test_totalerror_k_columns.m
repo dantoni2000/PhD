@@ -2,27 +2,6 @@
 %on best error E: the parallel one! 
 
 clear all, close all
-<<<<<<< HEAD
-err=1e-02;
-n=1000;
-
-C1 = [ones(n,1); -ones(n,1)];
-E1 = err*ones(2*n,1);
-
-for j=1:3
-
-C(:,j) = j*C1;
-EJ(:,j) = j*E1;
-
-end
-
-A = C*C';
-%A = C*randn(2*n,1)';
-
-CE=C+EJ;
-E=err*CE*ones(2*n,j)'; E(:,1:j)=EJ;
-E=E/norm(E,'fro')*norm(EJ,'fro');
-=======
 
 err = 1e-02;
 n = 1000;
@@ -47,7 +26,6 @@ A = C*randn(2*n,k)';
 CE = C+EJ;
 E = 7*err*CE*ones(2*n,k)'; E(:,1:k)=EJ;
 E = E/norm(E,'fro')*norm(EJ,'fro');
->>>>>>> 1d5be9a (initial commit)
 
 nc = norm(C,'fro')^2;
 ne = norm(E,'fro')^2;
@@ -66,10 +44,6 @@ n1 = norm(A-(CE)*pinv(CE)*(A+E),'fro')^2;
 
 %n2 = npf*(nc^2 + nej*nc)/(nc^2 + 2*nej*nc +nej^2) + (2*n-3)/(2*n)*ne + nej^2*(nc + nej)/(nc^2 + 2*nej*nc +nej^2);
 
-<<<<<<< HEAD
-n2 = npf + ne;
-=======
 n2 = npf + ne;
 
 %n1 - n2
->>>>>>> 1d5be9a (initial commit)
