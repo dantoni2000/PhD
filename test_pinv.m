@@ -1,10 +1,11 @@
 %test 21 02 2025
-%on best error E by choosing Ej as pseudoinverse of Vj...
+%on best error E by choosing Ej as pseudoinverse of Vj...a bit better but
+%not decisive yet!
 
 clear all, close all
 err = 1e-02;
-n = 10000;
-s = 40;
+n = 1000;
+s = 100;
 
 
 CEJ = randn(n,2*s);
@@ -22,14 +23,14 @@ C = QC*R(1:s,1:s);
 
 A = C*randn(n,s)'; A(:,1:s) = C;
 [U,S,V]=svd(A);
+
 VJ=pinv(C)*A*V';
 
-EJ = [zeros(s,n); U(s+1:n,:)]*VJ';
+EJ = U(:,s+1:2*s)*S(1:s,:)*VJ';
 EJ = err*EJ/norm(EJ,'fro');
 
-
 CE = C+EJ;
-E = err^2*CE*randn(n,s)'; E(:,1:s) = EJ;
+E = CE*randn(n,s)'; E=sqrt(err)*E/norm(E,'fro'); E(:,1:s) = EJ;
 
 nc = norm(C,'fro')^2;
 ne = norm(E,'fro')^2;
