@@ -4,7 +4,7 @@
 clear all, close all
 err = 1e-02;
 n = 1000;
-s = 40;
+s = 100;
 
 
 CEJ = randn(1000,2*s);
@@ -18,13 +18,12 @@ QC = Q(:,1:s);
 QEJ = Q(:,s+1:2*s);
 
 C = QC*R(1:s,1:s);
-EJ = err*QEJ*R(1:s,1:s)/norm(R(1:s,1:s)'*R(1:s,1:s),'fro');
+EJ = sqrt(s)*err*QEJ*R(1:s,1:s)/norm(R(1:s,1:s),'fro');
 
 A = C*randn(n,s)'; A(:,1:s) = C;
 
 CE = C+EJ;
-E = err*CE*randn(n,s)'; E(:,1:s) = EJ;
-E=E/norm(E,'fro')*norm(EJ,'fro');
+E = CE*randn(n,s)'; E=sqrt(n-s)*err*E/norm(E,'fro'); E(:,1:s) = EJ;
 
 nc = norm(C,'fro')^2;
 ne = norm(E,'fro')^2;

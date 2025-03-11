@@ -18,14 +18,14 @@ QC = Q(:,1:s);
 QEJ = Q(:,s+1:2*s);
 
 C = QC*R(1:s,1:k);
-EJ = err*QEJ*R(1:s,1:k)/norm(R(1:s,1:k)'*R(1:s,1:k),'fro');
+EJ = sqrt(k)*err*QEJ*R(1:s,1:k)/norm(R(1:s,1:k),'fro');
 
 %A = C*C';
 A = C*randn(2*n,k)';
 
 CE = C+EJ;
-E = 7*err*CE*ones(2*n,k)'; E(:,1:k)=EJ;
-E = E/norm(E,'fro')*norm(EJ,'fro');
+E = CE*ones(2*n,k)'; E(:,1:k)=EJ;
+E = sqrt(n-k)*err*E/norm(E,'fro');
 
 nc = norm(C,'fro')^2;
 ne = norm(E,'fro')^2;
