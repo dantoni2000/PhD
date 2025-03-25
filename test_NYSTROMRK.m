@@ -3,14 +3,14 @@ clear all
 n = 100;
 Q = randn(n,n); [Q,~] = qr(Q);
 g=linspace(1,n,n);
-G = diag(1./g.^0.1);
+G = diag(1./g.^0.5);
 % G = diag(exp(-g));
 A = Q*G*Q';
 v=ones(n,1);
 w=ones(n,1);
 v=v/norm(v);
 w=w/norm(w);
-p.m=20;
+p.m=100;
 p.tol=1e-10;
 p.smin=G(end,end);
 p.smax=G(1,1);

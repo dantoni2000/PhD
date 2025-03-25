@@ -1,7 +1,7 @@
 function [sz,Z]=Nystrom_RK_Lyap(A,B1,B2,params,X)
 
 [n,~]=size(A);
-lN_0=10; lN_max=n/2; qN=5; tolN_e=1e-4; tolN_r=1e-4; miN=1;
+lN_0=10; lN_max=n/2; qN=5; tolN_e=1e-4; tolN_r=1e-4; miN=1e-2;
 [UN,Lhat] = Adaptive_Nystrom(-A,lN_0,lN_max,qN,tolN_e,tolN_r,miN);
 [l,~]=size(Lhat);
 %[UN,Lhat] = Nystrom(-A,l);
@@ -103,8 +103,17 @@ while i < m
      ANyinv_z = UN*(UN'./diag(-sparse(Lhat)-znew*Il)) - 1/znew*(In-UN*UN');
      % ANyinv_z = (A-znew*In)^-1;
 
-     w1rk1 = ANyinv_s*w1; 
-     w2rk1 = ANyinv_z*w2;
+     if snew<1e-2
+        w1rk1 = A*w1; 
+     else
+        w1rk1 = ANyinv_s*w1; 
+     end
+
+     if znew<1e-2
+        w2rk1 = A*w2; 
+     else
+        w2rk1 = ANyinv_z*w2;
+     end
      
      %%%% All real basis implementation for RKSM %%%%%
      
