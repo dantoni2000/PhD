@@ -11,13 +11,12 @@ u(:,2) = r(:,1)/beta(1);
 for i=2:m
 
     w(:,i) = A*u(:,i);
-    alpha(i) = u(:,i)'*w(:,i);
+    alpha(i,1) = u(:,i)'*w(:,i);
     r(:,i) = w(:,i)-alpha(i)*u(:,i)-beta(i-1)*u(:,i-1);
-    beta(i) = norm(r(:,i));
+    beta(i,1) = norm(r(:,i));
     u(:,i+1) = r(:,i)/beta(i);
 
 end
-
-T = spdiags([[beta(:,2:m); 0],alpha,beta],-1:1,m:m);
-fT = log(T);
+T = diag(alpha) + diag(beta(1:m-1),1) + diag(beta(1:m-1),-1);
+fT = logm(T);
 tr = norm(x)^2 * fT(1,1);

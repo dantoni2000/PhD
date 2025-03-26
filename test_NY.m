@@ -1,4 +1,4 @@
-% 20 03 2025 Test Nystrom
+% 20 03 2025 Test Nystrom, sono tutti bound noti.
 
 n = 1000;
 Q = randn(n,n); [Q,~] = qr(Q);
