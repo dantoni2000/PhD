@@ -10,7 +10,7 @@ while E > tol_e  &&  lambda_l/mi > tol_r
     [Om_0,~] = qr(Om_0,0);
     Y_0 = A*Om_0;
     Y = [Y Y_0]; Om = [Om Om_0];
-    nu = sqrt(n)*eps*norm(Y,2); 
+    nu = sqrt(n)*eps(norm(Y,2)); 
     Y_nu = Y + nu*Om;
     C = chol(Om'*Y_nu);
     B = Y_nu/C;
@@ -31,7 +31,7 @@ while E > tol_e  &&  lambda_l/mi > tol_r
         [Om_0,~] = qr(Om_0,0);
         Y_0 = A*Om_0;
         Y = [Y Y_0]; Om = [Om Om_0];
-        nu = sqrt(n)*eps*norm(Y,2); 
+        nu = sqrt(n)*eps(norm(Y,2)); 
         Y_nu = Y + nu*Om;
         C = chol(Om'*Y_nu);
         B = Y_nu/C;

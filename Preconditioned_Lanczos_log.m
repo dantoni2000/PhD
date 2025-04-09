@@ -1,11 +1,12 @@
-function [its,tr] = Lanczos_log(A,mi,x,m)
+function [its,tr]=Preconditioned_Lanczos_log(A,mi,P,x,m)
 
 tol=1e-8;
 its = m;
 tr = 0; 
 
 u(:,1) = x/norm(x);
-w(:,1) = A*u(:,1) + mi*u(:,1);
+Pu(:,1) = P*u(:,1);
+w(:,1) = P*(A*Pu(:,1) + mi*Pu(:,1));
 alpha(1) = u(:,1)'*w(:,1);
 r(:,1) = w(:,1)-alpha(1)*u(:,1);
 beta(1) = norm(r(:,1));
@@ -14,13 +15,14 @@ T(1,1) = alpha(1);
 
 for i=2:m
     oldtr = tr;
-    w(:,i) = A*u(:,i) + mi*u(:,i);
+    Pu(:,i) = P*u(:,i);
+    w(:,i) = P*(A*Pu(:,i) + mi*Pu(:,i));
     alpha(i,1) = u(:,i)'*w(:,i);
     r(:,i) = w(:,i)-alpha(i)*u(:,i)-beta(i-1)*u(:,i-1);
 
     % Riortogonalizzazione con GS
     for j = 1:i
-        r(:,i) = r(:,i)-(u(:,j)'* r(:,i))*u(:,j);
+        r(:,i) = r(:,i)-(u(:,j)'*r(:,i))*u(:,j);
     end
 
     beta(i,1) = norm(r(:,i));
@@ -36,7 +38,7 @@ for i=2:m
     end
 
 end
-
+ 
 % T = diag(alpha) + diag(beta(1:end-1),1) + diag(beta(1:end-1),-1);
 % fT = logm(T);
 % tr = norm(x)^2 * fT(1,1);
