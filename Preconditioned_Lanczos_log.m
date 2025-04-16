@@ -2,7 +2,7 @@ function [its,tr]=Preconditioned_Lanczos_log(A,mi,P,x,m)
 
 tol=1e-8;
 its = m;
-tr = 0; 
+tr(1,1) = 0; 
 
 u(:,1) = x/norm(x);
 Pu(:,1) = P*u(:,1);
@@ -14,14 +14,19 @@ u(:,2) = r(:,1)/beta(1);
 T(1,1) = alpha(1);
 
 for i=2:m
-    oldtr = tr;
+    oldtr = tr(i-1,1);
     Pu(:,i) = P*u(:,i);
     w(:,i) = P*(A*Pu(:,i) + mi*Pu(:,i));
     alpha(i,1) = u(:,i)'*w(:,i);
     r(:,i) = w(:,i)-alpha(i)*u(:,i)-beta(i-1)*u(:,i-1);
 
+    % Ortogonalizzazione con GS
+    for j=1:i
+        r(:,i) = r(:,i)-(u(:,j)'*r(:,i))*u(:,j);
+    end
+
     % Riortogonalizzazione con GS
-    for j = 1:i
+    for j=1:i
         r(:,i) = r(:,i)-(u(:,j)'*r(:,i))*u(:,j);
     end
 
@@ -30,15 +35,14 @@ for i=2:m
 
     T(i,i) = alpha(i,1); T(i,i-1)=beta(i-1,1); T(i-1,i)=beta(i-1,1);
     fT = logm(T);
-    tr = norm(x)^2 * fT(1,1);
+    tr(i,1) = norm(x)^2 * fT(1,1);
 
-    if abs(tr-oldtr)<=tol*abs(tr)
-        its=i;
+    if abs(tr(i,1)-oldtr)<=tol*abs(tr(i,1))
+        its=i-1;
         break
     end
 
 end
- 
 % T = diag(alpha) + diag(beta(1:end-1),1) + diag(beta(1:end-1),-1);
 % fT = logm(T);
 % tr = norm(x)^2 * fT(1,1);

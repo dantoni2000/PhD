@@ -2,7 +2,7 @@ function [its,tr] = Lanczos_log(A,mi,x,m)
 
 tol=1e-8;
 its = m;
-tr = 0; 
+tr(1,1) = 0; 
 
 u(:,1) = x/norm(x);
 w(:,1) = A*u(:,1) + mi*u(:,1);
@@ -13,13 +13,13 @@ u(:,2) = r(:,1)/beta(1);
 T(1,1) = alpha(1);
 
 for i=2:m
-    oldtr = tr;
+    oldtr = tr(i-1,1);
     w(:,i) = A*u(:,i) + mi*u(:,i);
     alpha(i,1) = u(:,i)'*w(:,i);
     r(:,i) = w(:,i)-alpha(i)*u(:,i)-beta(i-1)*u(:,i-1);
 
     % Riortogonalizzazione con GS
-    for j = 1:i
+    for j=1:i
         r(:,i) = r(:,i)-(u(:,j)'* r(:,i))*u(:,j);
     end
 
@@ -28,10 +28,10 @@ for i=2:m
 
     T(i,i) = alpha(i,1); T(i,i-1)=beta(i-1,1); T(i-1,i)=beta(i-1,1);
     fT = logm(T);
-    tr = norm(x)^2 * fT(1,1);
+    tr(i,1) = norm(x)^2 * fT(1,1);
 
-    if abs(tr-oldtr)<=tol*abs(tr)
-        its=i;
+    if abs(tr(i,1)-oldtr)<=tol*abs(tr(i,1))
+        its=i-1;
         break
     end
 

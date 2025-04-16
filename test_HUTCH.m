@@ -21,26 +21,21 @@ switch decadimento
         semilogy(diag(G))
         hold on 
         semilogy(diag(G)+mi*ones(n))
-        
-    end
 
-switch decadimento
     case 2
         G = diag(1./sqrt(g));
         figure(1)
         semilogy(diag(G))
         hold on 
         semilogy(diag(G)+mi*ones(n))
-    end
 
-switch decadimento
     case 3
         G = diag(exp(-g));
         figure(1)
         semilogy(diag(G))
         hold on 
         semilogy(diag(G)+mi*ones(n))
-    end
+end
 
 A = Q*G*Q';
 trA = sum(log(diag(G+mi*eye(n,n))),"all");

@@ -74,11 +74,11 @@ switch decadimento
         semilogy(diag(G)+mi*ones(n))
 
     case 5
-        n = 1000;
+        n = 2000;
         mi = 1e-4;
-        alpha = 1; nu = 11/2;
+        alpha = 1; nu = 5/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
-        data_matrix = orth(randn(n,n))*diag(1:n);
+        data_matrix = 1/n*randn(n,n);
 
         for row = 1:n
 
