@@ -4,7 +4,7 @@ warning off
 
 T = 1; dl = 20; s = 10;
 
-decadimento=1;
+decadimento=4;
 
 switch decadimento
     case 0
@@ -62,7 +62,7 @@ switch decadimento
         data_matrix = orth(randn(n,n))*diag(1:n);
         A = build_kernel_matrix(data_matrix,kernel);
         [Q,G] = svd(A);
-        G=diag(diag(G));
+        G=diag((2-diag(G).^.1));
         A = Q*G*Q';
         figure(1)
         semilogy(diag(G))
@@ -74,7 +74,7 @@ switch decadimento
         mi = 5e-6;
         alpha = 1; nu = 5/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
-        data_matrix = 1/n*randn(n,n);
+        data_matrix = randn(1,n);
 
         for row = 1:n
 
@@ -109,7 +109,7 @@ ct = 0;
 for l = [10 50 100 150 200]
     ct = ct+1;
     % Nystrom su inv(A)
-    [iU,iLhat] = Nystrom(inv(A),l);  iLhat=inv(iLhat); ill = iLhat(l,l);
+    [iU,iLhat] = Nystrom(inv(A+1e-14*eye(n)),l);  iLhat=inv(iLhat); ill = iLhat(l,l);
     iP = (ill+mi)^0.5*iU*(iLhat+mi*eye(l))^-0.5*iU' + (eye(n) - iU*iU');
     lgPiAPi = logm(iP*(A+mi*eye(n))*iP);
 

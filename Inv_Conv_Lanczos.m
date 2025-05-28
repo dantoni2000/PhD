@@ -7,7 +7,7 @@ warning off
 
 T = 1; dl = 20; s = 10;
 
-decadimento=0;
+decadimento=3;
 
 switch decadimento
     case 0
@@ -50,7 +50,7 @@ switch decadimento
         n = 1000;
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
-        mi = 1e-3;
+        mi = 1;
         G = diag(exp(-g));
         A = Q*G*Q';
         figure(1)
@@ -77,7 +77,7 @@ switch decadimento
         mi = 5e-6;
         alpha = 1; nu = 5/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
-        data_matrix = 1/n*randn(n,n);
+        data_matrix = randn(1,n);
 
         for row = 1:n
 
@@ -116,12 +116,12 @@ for t=1:T
     for l=10:10:10*dl
         
         % Nystrom su inv(A)
-        [iU,iLhat] = Nystrom(inv(A),l);  iLhat=inv(iLhat); ill = iLhat(l,l);
+        [iU,iLhat] = Nystrom(inv(A+1e-14*eye(n)),l);  iLhat=inv(iLhat); ill = iLhat(l,l);
         iP = (ill+mi)^0.5*iU*(iLhat+mi*eye(l))^-0.5*iU' + (eye(n) - iU*iU');
         % trPRECi(l/10,1) = log((ill+mi)^(-l)*prod(diag(iLhat+mi*eye(l,l))));
 
         % Nystrom su A
-        [U,Lhat] = Nystrom(A,l);  ll = Lhat(l,l);
+        [U,Lhat] = Nystrom(A,l);  ll = 0 * Lhat(l,l);
         P = (ll+mi)^0.5*U*(Lhat+mi*eye(l))^-0.5*U' + (eye(n) - U*U');
         % plot(eigs(P*(A+mi*eye(n))*P));
         % trPREC(l/10,1) = log((ll+mi)^(-l)*prod(diag(Lhat+mi*eye(l,l))));
@@ -136,22 +136,22 @@ for t=1:T
         %Hutchinson sulla matrice precondizionata con Nystrom sull'inversa
         [iPits(l/10),iPtr,ih] = Preconditioned_HUTCH(A,mi,iP,s,500,1,0);
         % PreHutch(l/10,s/10) = trPREC(l/10,1) + iPtr;
-        ciPAP = 2*sqrt(cond(iP*A*iP)+1)*log(2*cond(iP*A*iP));
-        rhoiPAP = ((sqrt(cond(iP*A*iP)+1)-1)/(sqrt(cond(iP*A*iP)+1)+1))^2;
+        ciPAP = 2*sqrt(cond(iP*(A+mi*eye)*iP)+1)*log(2*cond(iP*(A+mi*eye)*iP));
+        rhoiPAP = ((sqrt(cond(iP*(A+mi*eye)*iP)+1)-1)/(sqrt(cond(iP*(A+mi*eye)*iP)+1)+1))^2;
         % bound teorico
         % b = semilogy(cPAP*rhoPAP.^[1:fix(Pits(l/10))+1],'b');        
         hold on
 
         %Hutchinson sulla matrice precondizionata con Nystrom
         [Pits(l/10),Ptr,h] = Preconditioned_HUTCH(A,mi,P,s,500,0,0);
-        cPAP = 2*sqrt(cond(P*A*P)+1)*log(2*cond(P*A*P));
-        rhoPAP = ((sqrt(cond(P*A*P)+1)-1)/(sqrt(cond(P*A*P)+1)+1))^2;
+        cPAP = 2*sqrt(cond(P*(A+mi*eye)*P)+1)*log(2*cond(P*(A+mi*eye)*P));
+        rhoPAP = ((sqrt(cond(P*(A+mi*eye)*P)+1)-1)/(sqrt(cond(P*(A+mi*eye)*P)+1)+1))^2;
         hold on
 
         %Hutchinson sulla matrice precondizionata con media dei due Nystrom
         [Qits(l/10),Qtr,md] = Preconditioned_HUTCH(A,mi,Q,s,500,2,0);
-        cQAQ = 2*sqrt(cond(Q*A*Q)+1)*log(2*cond(Q*A*Q));
-        rhoQAQ = ((sqrt(cond(Q*A*Q)+1)-1)/(sqrt(cond(Q*A*Q)+1)+1))^2;
+        cQAQ = 2*sqrt(cond(Q*(A+mi*eye)*Q)+1)*log(2*cond(Q*(A+mi*eye)*Q));
+        rhoQAQ = ((sqrt(cond(Q*(A+mi*eye)*Q)+1)-1)/(sqrt(cond(Q*(A+mi*eye)*Q)+1)+1))^2;
         hold on
 
         [its(l/10),tr,k] = EST(A,mi,s,500,0);

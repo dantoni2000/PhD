@@ -31,9 +31,6 @@ else
         % v = randn(n,1);
         [it(i),trr] = Lanczos_log(A,mi,v,m);
         tr = tr + trr(end,1);
-        truetr = v'*logm(A+mi*eye(n))*v;
-        abs_err = abs(trr-truetr);
-        rel_err = abs_err/abs(truetr);
     end
     
     its = 1/N*sum(it);

@@ -39,9 +39,6 @@ else
         % v = randn(n,1);
         [Pit(i),tr] = Preconditioned_Lanczos_log(A,mi,P,v,m);
         Ptr = Ptr + tr(end,1);
-        truetr = v'*logm(P*(A+mi*eye(n))*P)*v;
-        abs_err = abs(tr-truetr);
-        rel_err = abs_err/abs(truetr);
     end
     
     its = 1/N*sum(Pit);

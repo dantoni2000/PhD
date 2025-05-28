@@ -1,6 +1,6 @@
 function [its,tr] = Lanczos_log(A,mi,x,m)
 
-tol=1e-8;
+tol=1e-12;
 its = m;
 tr(1,1) = 0; 
 

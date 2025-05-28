@@ -4,7 +4,7 @@ warning off
 
 T = 1; dl = 20; s = 10;
 
-decadimento=1;
+decadimento=7;
 
 switch decadimento
     case 0
@@ -71,10 +71,10 @@ switch decadimento
 
     case 5
         n = 1000;
-        mi = 5e-6;
+        mi = 1;
         alpha = 1; nu = 5/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
-        data_matrix = 1/n*randn(n,n);
+        data_matrix = randn(1,n);
 
         for row = 1:n
 
@@ -101,6 +101,21 @@ switch decadimento
         semilogy(diag(G))
         hold on 
         semilogy(diag(G)+mi*ones(n))
+
+    case 7
+        n = 1000; mi = 1;
+        G = sparse(diag(exp(-(1:n)/100)));
+        %D = sparse(diag((1:matrix_size)).^(-3));
+        Q = gallery('orthog',n,1);
+        A = Q*G*Q';
+        figure(1)
+        semilogy(diag(G))
+        hold on 
+        semilogy(diag(G)+mi*ones(n))
+        xlabel('$n$','interpreter','Latex')
+        ylabel('eigenvalues')
+        title('Eigenvalues of kernel matrix')
+        legend('$\lambda(A)$','$\lambda(A + \mu I)$','interpreter','Latex')
 end
 
 % lgA = log(diag(G+mi*eye(n)));
@@ -108,13 +123,19 @@ lgA = logm(A+mi*eye(n));
 ct = 0;
 for l = [10 50 100 150 200]
     ct = ct+1;
+    
     % Nystrom su inv(A)
-    [iU,iLhat] = Nystrom(inv(A),l);  iLhat=inv(iLhat); ill = iLhat(l,l);
+    [iU,iLhat] = Nystrom(inv(A+1e-14*eye(n)),l);  iLhat=inv(iLhat); ill = 0*iLhat(l,l);
     iP = (ill+mi)^0.5*iU*(iLhat+mi*eye(l))^-0.5*iU' + (eye(n) - iU*iU');
     lgPiAPi = logm(iP*(A+mi*eye(n))*iP);
 
+    % % Nystrom su inv(A)
+    % [iiU,iiLhat] = Nystrom(A,l); iill = iiLhat(1,1);
+    % iiP = (iill+mi)^0.5*iiU*(iiLhat+mi*eye(l-4))^-0.5*iiU' + (eye(n) - iiU*iiU');
+    % lgPiiAPii = logm(iiP*(A+mi*eye(n))*iiP);
+
     % Nystrom su A
-    [U,Lhat] = Nystrom(A,l);  ll = Lhat(l,l);
+    [U,Lhat] = Nystrom(A,l);  ll = 0*Lhat(l,l);
     P = (ll+mi)^0.5*U*(Lhat+mi*eye(l))^-0.5*U' + (eye(n) - U*U');
     lgPAP = logm(P*(A+mi*eye(n))*P);
 
@@ -130,12 +151,14 @@ for l = [10 50 100 150 200]
         v = randn(n,1);
         esA_G(j) = v'*lgA*v;
         esPiAPi_G(j) = v'*lgPiAPi*v;
+        % esPiiAPii_G(j) = v'*lgPiiAPii*v;
         esPAP_G(j) = v'*lgPAP*v;
         esQAQ_G(j) = v'*lgQAQ*v;
 
         w = randsrc(n,1);
         esA_R(j) = w'*lgA*w;
         esPiAPi_R(j) = w'*lgPiAPi*w;
+        % esPiiAPii_R(j) = w'*lgPiiAPii*w;
         esPAP_R(j) = w'*lgPAP*w;
         esQAQ_R(j) = w'*lgQAQ*w;
 
@@ -143,6 +166,7 @@ for l = [10 50 100 150 200]
         z = sqrt(n)*z/norm(z);
         esA_U(j) = z'*lgA*z;
         esPiAPi_U(j) = z'*lgPiAPi*z;
+        % esPiiAPii_U(j) = z'*lgPiiAPii*z;
         esPAP_U(j) = z'*lgPAP*z;
         esQAQ_U(j) = z'*lgQAQ*z;
     end
@@ -154,6 +178,10 @@ for l = [10 50 100 150 200]
     meanPiAPi_G = sum(esPiAPi_G(:))/N;
     varPiAPi_G(ct,1) = sum((esPiAPi_G-meanPiAPi_G).^2)/N;
     ctrlPiAPi_G(ct,1) = 2*norm(lgPiAPi,'fro')^2;
+
+    % meanPiiAPii_G = sum(esPiiAPii_G(:))/N;
+    % varPiiAPii_G(ct,1) = sum((esPiiAPii_G-meanPiiAPii_G).^2)/N;
+    % ctrlPiiAPii_G(ct,1) = 2*norm(lgPiiAPii,'fro')^2;
 
     meanPAP_G = sum(esPAP_G(:))/N;
     varPAP_G(ct,1) = sum((esPAP_G-meanPAP_G).^2)/N;
@@ -172,6 +200,10 @@ for l = [10 50 100 150 200]
     varPiAPi_R(ct,1) = sum((esPiAPi_R-meanPiAPi_R).^2)/N;
     ctrlPiAPi_R(ct,1) = 2*(norm(lgPiAPi,'fro')^2-norm(diag(lgPiAPi))^2);
 
+    % meanPiiAPii_R = sum(esPiiAPii_R(:))/N;
+    % varPiiAPii_R(ct,1) = sum((esPiiAPii_R-meanPiiAPii_R).^2)/N;
+    % ctrlPiiAPii_R(ct,1) = 2*(norm(lgPiiAPii,'fro')^2-norm(diag(lgPiiAPii))^2);
+
     meanPAP_R = sum(esPAP_R(:))/N;
     varPAP_R(ct,1) = sum((esPAP_R-meanPAP_R).^2)/N;
     ctrlPAP_R(ct,1) = 2*(norm(lgPAP,'fro')^2-norm(diag(lgPAP))^2);
@@ -188,6 +220,10 @@ for l = [10 50 100 150 200]
     meanPiAPi_U = sum(esPiAPi_U(:))/N;
     varPiAPi_U(ct,1) = sum((esPiAPi_U-meanPiAPi_U).^2)/N;
     ctrlPiAPi_U(ct,1) = (2*n/(2+n))*(norm(lgPiAPi,'fro')^2-1/n*trace(lgPiAPi)^2);
+
+    % meanPiiAPii_U = sum(esPiiAPii_U(:))/N;
+    % varPiiAPii_U(ct,1) = sum((esPiiAPii_U-meanPiiAPii_U).^2)/N;
+    % ctrlPiiAPii_U(ct,1) = (2*n/(2+n))*(norm(lgPiiAPii,'fro')^2-1/n*trace(lgPiiAPii)^2);
 
     meanPAP_U = sum(esPAP_U(:))/N;
     varPAP_U(ct,1) = sum((esPAP_U-meanPAP_U).^2)/N;
@@ -208,6 +244,10 @@ plot([10 50 100 150 200],varPiAPi_G,'o-c')
 hold on
 plot([10 50 100 150 200],ctrlPiAPi_G,'c')
 hold on
+% plot([10 50 100 150 200],varPiiAPii_G,'o-k')
+% hold on
+% plot([10 50 100 150 200],ctrlPiiAPii_G,'k')
+% hold on
 plot([10 50 100 150 200],varPAP_G,'o-r')
 hold on
 plot([10 50 100 150 200],ctrlPAP_G,'r')
@@ -229,6 +269,10 @@ plot([10 50 100 150 200],varPiAPi_R,'o-c')
 hold on
 plot([10 50 100 150 200],ctrlPiAPi_R,'c')
 hold on
+% plot([10 50 100 150 200],varPiiAPii_R,'o-k')
+% hold on
+% plot([10 50 100 150 200],ctrlPiiAPii_R,'k')
+% hold on
 plot([10 50 100 150 200],varPAP_R,'o-r')
 hold on
 plot([10 50 100 150 200],ctrlPAP_R,'r')
@@ -251,6 +295,10 @@ plot([10 50 100 150 200],varPiAPi_U,'o-c')
 hold on
 plot([10 50 100 150 200],ctrlPiAPi_U,'c')
 hold on
+% plot([10 50 100 150 200],varPiiAPii_U,'o-k')
+% hold on
+% plot([10 50 100 150 200],ctrlPiiAPii_U,'k')
+% hold on
 plot([10 50 100 150 200],varPAP_U,'o-r')
 hold on
 plot([10 50 100 150 200],ctrlPAP_U,'r')
