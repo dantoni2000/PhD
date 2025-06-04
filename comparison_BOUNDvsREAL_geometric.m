@@ -18,6 +18,11 @@ for l=15:10:95
         alpha = 0.64 +0.05*j;
         A = diag(alpha.^(g));
         trA(j) = sum(log(diag(A+mi*eye(n,n))),"all");
+        
+        norm(A(l+1:n,l+1:n),'fro') - alpha.^(l+1) .* sqrt(1-alpha.^(2*(n-l)))./sqrt(1-alpha.^2)
+        norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - alpha.^(l+1) .* (1-alpha.^((n-l)))./(1-alpha)
+        norm(A(l+1:n,l+1:n)) - alpha.^(l+1)
+
 
         mvecs((l-5)/10 ) = l;
         
@@ -27,8 +32,8 @@ for l=15:10:95
         ExperrtrBig((l-5)/10,j) = ExperrtrBig((l-5)/10,j) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA(j));
         
         %Nystrom con 1 Hutch 5 Lanczos
-        l1 = l-3;
-        [~,trr] = Nystrom_HUTCH(A,mi,l1,1,3,1,1);
+        l1 = l-5;
+        [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
         Experrtr1((l-5)/10,j) = Experrtr1((l-5)/10,j) + abs(trr - trA(j));
 
         end
@@ -57,9 +62,9 @@ for tMV = 10:10:90
         p = tMV - s;
 
         % boundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .* (sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2) + (k-1)/p .*sqrt(1-alpha.^(n-k))./ sqrt(1-alpha) + min(exp(1) .* sqrt(k+p)/p .* sqrt((k-1)/p), (k-1)/p) .*(1-alpha.^(n-k))./ (1-alpha));
-        boundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+3) .* (sqrt(1-alpha.^(2*(n-k-2)))./sqrt(1-alpha.^2) + (k+2-1)/p .*sqrt(1-alpha.^(n-k-2))./ sqrt(1-alpha) + min(exp(1) .* sqrt(k+2+p)/p .* sqrt((k+2-1)/p), (k+2-1)/p) .*(1-alpha.^(n-k-2))./ (1-alpha));
-        boundBIGNys(:,s/2-1) = alpha.^(k+6) .* (1+(k+5-1)/(p)) .*(1-alpha.^(n-k-5))./(1-alpha); 
-        badboundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+3) .*(sqrt(1-alpha.^(2*(n-k-2)))./sqrt(1-alpha.^2) + (k+2-1)/p .*(1-alpha.^(n-k-2))./ (1-alpha));
+        boundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .* (sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2) + (k)/(p-1) .*sqrt(1-alpha.^(n-k))./ sqrt(1-alpha) + min(exp(1) .* sqrt(k+p)/p .* sqrt((k)/(p-1)), (k)/(p-1)) .*(1-alpha.^(n-k))./ (1-alpha));
+        boundBIGNys(:,s/2-1) = alpha.^(k+6) .* (1+(k+5)/(p-1)) .*(1-alpha.^(n-k-5))./(1-alpha); 
+        badboundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .*(1 + (k)/(p-1)).* sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2);
     end
     
     BESTPrecSTE = min(boundPrecSTE');

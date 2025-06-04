@@ -18,6 +18,10 @@ for l=15:10:95
         A = diag(g.^-alpha);
         trA(j) = sum(log(diag(A+mi*eye(n,n))),"all");
 
+        norm(A(l+1:n,l+1:n),'fro') - 1./sqrt(2.*alpha-1) .* sqrt( (l.^(-2*alpha+1) - n.^(-2*alpha+1)) )
+        norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - 1./(alpha-1) .* ( (l.^(-alpha+1) - n.^(-alpha+1)) )
+        norm(A(l+1:n,l+1:n)) - (l+1).^ (-alpha)
+
         mvecs((l-5)/10 ) = l;
         
         for t=1:T
@@ -54,9 +58,9 @@ for tMV = 10:10:90
         k = s;
         p = tMV - s;
         
-        boundPrecSTE(:,s/2-1) = sqrt(2) .* (1./sqrt(2.*alpha-1) .* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + (k-1)/p .*1./sqrt(alpha-1).*(k+1).^(-alpha/2).*sqrt( (k.^(-alpha+1) - n.^(-alpha+1)) ) + (k.^(-alpha+1) - n.^(-alpha+1)) .* min(exp(1) .* sqrt(k+p)/p .* sqrt((k-1)/p),(k-1)/p) .* 1./(alpha-1));
-        boundBIGNys(:,s/2-1) = ((1 + (k+5-1)/(p)).*1./(alpha-1).*((k+5).^(-alpha+1) - n.^(-alpha+1)));
-        badboundPrecSTE(:,s/2-1) = sqrt(2) .* (1./sqrt(2.*alpha-1).* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + k.^(-alpha+1) .* (k-1)/p .* 1./(alpha-1));
+        boundPrecSTE(:,s/2-1) = sqrt(2) .* (1./sqrt(2.*alpha-1) .* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + (k)/(p-1) ./sqrt(alpha-1).*(k+1).^(-alpha/2).*sqrt( (k.^(-alpha+1) - n.^(-alpha+1)) ) + (k.^(-alpha+1) - n.^(-alpha+1)) .* min(exp(1) .* sqrt(k+p)/p .* sqrt((k)/(p-1)),(k)/(p-1)) .* 1./(alpha-1));
+        boundBIGNys(:,s/2-1) = ((1 + (k+5)/(p-1)).*1./(alpha-1).*((k+5).^(-alpha+1) - n.^(-alpha+1)));
+        badboundPrecSTE(:,s/2-1) = sqrt(2) .* ((1 + ((k)/(p-1))).*1./sqrt(2.*alpha-1).* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ));
     end
     
     BESTPrecSTE = min(boundPrecSTE');
@@ -68,11 +72,11 @@ for tMV = 10:10:90
     intersection = find(indexbound);
     
         if ~isempty(intersection) 
-            coef = alpha(intersection(1));
-            nu(tMV/10) = coef(1);
+            coef = alpha(intersection(end));
+            nu(tMV/10) = coef(end);
         else 
-            coef = alpha(1);
-            nu(tMV/10) = coef(1);
+            coef = alpha(end);
+            nu(tMV/10) = coef(end);
         end
         
         badindexbound = abs(BESTbadPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
