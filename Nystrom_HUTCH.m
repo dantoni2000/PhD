@@ -5,7 +5,7 @@ if flag2==0
     Ptr = 0;
     Pit = zeros(N,1);
 
-    [U,Lhat] = Nystrom(A,s);
+    [U,Lhat] = PinvNystrom(A,s);
     P = (mi)^0.5*U*(Lhat+mi*eye(s))^-0.5*U' + (eye(n) - U*U');
 
     Pp = sum(log(diag(Lhat+mi*eye(s,s))),"all");
@@ -40,12 +40,12 @@ else
     Ptr = 0;
     Pit = zeros(N,1);
 
-    [U,Lhat] = Nystrom(A,s);
+    [U,Lhat] = PinvNystrom(A,s);
     Pp = sum(log(diag(Lhat+mi*eye(s,s))),"all");
     
     for i = 1:N
-        % v = randsrc(n,1);
-        v = randn(n,1);
+        v = randsrc(n,1);
+        %v = randn(n,1);
         [Pit(i),tr] = Nystrom_Lanczos_log(A,mi,U,Lhat,v,m);
         % P = (mi)^0.5*U*(Lhat+mi*eye(s))^-0.5*U' + (eye(n) - U*U');
         % tr(end,1) - trace(logm(P*(A+eye(n))*P))

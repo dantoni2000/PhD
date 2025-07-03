@@ -5,11 +5,12 @@ clear all
 close all
 warning off
 T = 100;
-n = 1000;
+n = 100;
 g = linspace(1,n,n)';
 mi = 1;
 ExperrtrBig=zeros(9,6);
 Experrtr1=zeros(9,6);
+ExperrtrNoPrec = zeros(9,6);
 
 for l=15:10:95
 
@@ -19,9 +20,9 @@ for l=15:10:95
         A = diag(alpha.^(g));
         trA(j) = sum(log(diag(A+mi*eye(n,n))),"all");
         
-        norm(A(l+1:n,l+1:n),'fro') - alpha.^(l+1) .* sqrt(1-alpha.^(2*(n-l)))./sqrt(1-alpha.^2)
-        norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - alpha.^(l+1) .* (1-alpha.^((n-l)))./(1-alpha)
-        norm(A(l+1:n,l+1:n)) - alpha.^(l+1)
+        % norm(A(l+1:n,l+1:n),'fro') - alpha.^(l+1) .* sqrt(1-alpha.^(2*(n-l)))./sqrt(1-alpha.^2)
+        % norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - alpha.^(l+1) .* (1-alpha.^((n-l)))./(1-alpha)
+        % norm(A(l+1:n,l+1:n)) - alpha.^(l+1)
 
 
         mvecs((l-5)/10 ) = l;
@@ -36,6 +37,11 @@ for l=15:10:95
         [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
         Experrtr1((l-5)/10,j) = Experrtr1((l-5)/10,j) + abs(trr - trA(j));
 
+        %Nystrom con n Hutch
+        [~,trrNoPrec] = EST(A,mi,l/5,5,1);
+        ExperrtrNoPrec((l-5)/10,j) = ExperrtrNoPrec((l-5)/10,j) + abs(trrNoPrec - trA(j));
+
+
         end
     
     end
@@ -44,12 +50,15 @@ end
 
 etrBig = 1/T * ExperrtrBig;
 etr1 = 1/T * Experrtr1;
+etrNoPrec = 1/T * ExperrtrNoPrec;
 
 for r=1:1:9
     figure(r)
     semilogy(0.69:0.05:0.94,etr1(r,:)','r')
     hold on
     semilogy(0.69:0.05:0.94,etrBig(r,:)','b')
+    hold on
+    semilogy(0.69:0.05:0.94,etrNoPrec(r,:)','g')
     hold on
 end
 
@@ -64,12 +73,13 @@ for tMV = 10:10:90
         % boundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .* (sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2) + (k-1)/p .*sqrt(1-alpha.^(n-k))./ sqrt(1-alpha) + min(exp(1) .* sqrt(k+p)/p .* sqrt((k-1)/p), (k-1)/p) .*(1-alpha.^(n-k))./ (1-alpha));
         boundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .* (sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2) + (k)/(p-1) .*sqrt(1-alpha.^(n-k))./ sqrt(1-alpha) + min(exp(1) .* sqrt(k+p)/p .* sqrt((k)/(p-1)), (k)/(p-1)) .*(1-alpha.^(n-k))./ (1-alpha));
         boundBIGNys(:,s/2-1) = alpha.^(k+6) .* (1+(k+5)/(p-1)) .*(1-alpha.^(n-k-5))./(1-alpha); 
-        badboundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .*(1 + (k)/(p-1)).* sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2);
+        badboundPrecSTE(:,s/2-1) = sqrt(2) * alpha.^(k+1) .*(1 + (k)/(p-1)).* sqrt(1-alpha.^(2*(n-k)))./sqrt(1-alpha.^2); 
     end
     
     BESTPrecSTE = min(boundPrecSTE');
     BESTBIGNys = min(boundBIGNys');
     BESTbadPrecSTE = min(badboundPrecSTE');
+    BESTNONyst = sqrt(10/(tMV+5) .* alpha.^2.* (1-alpha.^(2*n))./(1-alpha.^2));
     
     tol = 1e-2;
     indexbound = abs(BESTPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
@@ -95,11 +105,15 @@ for tMV = 10:10:90
         end
     
     figure(tMV/10)
-    semilogy(alpha, BESTPrecSTE,'-or')
+    semilogy(alpha, BESTNONyst,'-og')
     hold on
     semilogy(alpha, BESTbadPrecSTE,'-dr')
     hold on
     semilogy(alpha, BESTBIGNys,'-ob')
+
+    xlabel('$\alpha$', 'Interpreter','latex')
+    ylabel('error')
+    legend('error Nystrom+Lanczos', 'error Big Nystrom', 'error No Nystrom', 'bound No Nystrom', 'bound Nystrom+Lanczos', 'conjecture Nystrom+Lanczos', 'bound Big Nystrom')
     
 end
 figure(100)
@@ -109,5 +123,5 @@ figure(100)
     % hold on
     plot(max(nu,badnu),'-*k')
     xlabel('$k$', 'Interpreter', 'latex')
-    ylabel('$\nu$', 'Interpreter', 'latex')
-    title('Coefficient $\nu$ for which $trace \log((I + x_{ii}^{-\nu}))$ can be better approximated with PrecSTE', 'Interpreter','latex')
+    ylabel('$-\log(\alpha)$', 'Interpreter', 'latex')
+    title('Coefficient $-\log(\alpha)$ for which $trace \log((I + \alpha^{-x_{ii}}))$ can be better approximated with PrecSTE', 'Interpreter','latex')

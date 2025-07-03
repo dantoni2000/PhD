@@ -1,6 +1,7 @@
 function [its,tr] = Lanczos_log(A,mi,x,m)
 
-tol=1e-12;
+tolrel = 1e-10;
+tolabs = 1e-10;
 its = m;
 tr(1,1) = 0; 
 
@@ -30,7 +31,12 @@ for i=2:m
     fT = logm(T);
     tr(i,1) = norm(x)^2 * fT(1,1);
 
-    if abs(tr(i,1)-oldtr)<=tol*abs(tr(i,1))
+    if abs(tr(i,1)-oldtr)<=tolrel*abs(tr(i,1))
+        its=i-1;
+        break
+    end
+
+    if abs(tr(i,1)-oldtr)<=tolabs
         its=i-1;
         break
     end

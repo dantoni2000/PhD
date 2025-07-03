@@ -28,7 +28,7 @@ else
     
     for i = 1:N
         v = randsrc(n,1);
-        % v = randn(n,1);
+        %v = randn(n,1);
         [it(i),trr] = Lanczos_log(A,mi,v,m);
         tr = tr + trr(end,1);
     end

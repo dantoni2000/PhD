@@ -8,8 +8,9 @@ T = 100;
 n = 1000;
 g = linspace(1,n,n)';
 mi = 1;
-ExperrtrBig=zeros(9,9);
-Experrtr1=zeros(9,9);
+ExperrtrBig = zeros(9,9);
+Experrtr1 = zeros(9,9);
+ExperrtrNoPrec = zeros(9,9);
 
 for l=15:10:95
 
@@ -18,9 +19,9 @@ for l=15:10:95
         A = diag(g.^-alpha);
         trA(j) = sum(log(diag(A+mi*eye(n,n))),"all");
 
-        norm(A(l+1:n,l+1:n),'fro') - 1./sqrt(2.*alpha-1) .* sqrt( (l.^(-2*alpha+1) - n.^(-2*alpha+1)) )
-        norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - 1./(alpha-1) .* ( (l.^(-alpha+1) - n.^(-alpha+1)) )
-        norm(A(l+1:n,l+1:n)) - (l+1).^ (-alpha)
+        % norm(A(l+1:n,l+1:n),'fro') - 1./sqrt(2.*alpha-1) .* sqrt( (l.^(-2*alpha+1) - n.^(-2*alpha+1)) )
+        % norm(A(l+1:n,l+1:n).^0.5 ,'fro')^2 - 1./(alpha-1) .* ( (l.^(-alpha+1) - n.^(-alpha+1)) )
+        % norm(A(l+1:n,l+1:n)) - (l+1).^ (-alpha)
 
         mvecs((l-5)/10 ) = l;
         
@@ -34,6 +35,10 @@ for l=15:10:95
         [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
         Experrtr1((l-5)/10,j) = Experrtr1((l-5)/10,j) + abs(trr - trA(j));
         
+        %Nystrom con n Hutch
+        [~,trrNoPrec] = EST(A,mi,l/5,5,1);
+        ExperrtrNoPrec((l-5)/10,j) = ExperrtrNoPrec((l-5)/10,j) + abs(trrNoPrec - trA(j));
+
         end
     
     end
@@ -42,6 +47,7 @@ end
 
 etrBig = 1/T * ExperrtrBig;
 etr1 = 1/T * Experrtr1;
+etrNoPrec = 1/T * ExperrtrNoPrec;
 
 for r=1:1:9
     figure(r)
@@ -49,9 +55,11 @@ for r=1:1:9
     hold on
     semilogy(1.5:1:9.5,etrBig(r,:)','b')
     hold on
+    semilogy(1.5:1:9.5,etrNoPrec(r,:)','g')
+    hold on
 end
 
-alpha = linspace(1.5,9.5,10000);
+alpha = linspace(1.5,9.5,5000);
 for tMV = 10:10:90
 
     for s = 4:2:tMV-4
@@ -66,17 +74,18 @@ for tMV = 10:10:90
     BESTPrecSTE = min(boundPrecSTE');
     BESTBIGNys = min(boundBIGNys');
     BESTbadPrecSTE = min(badboundPrecSTE');
+    BESTNONys = sqrt( 10/(tMV+5) .* ( zeta(2.*alpha) - 1./(2.*alpha-1) .* n.^(-2*alpha+1)) );
     
-    tol = 5e-4;
+    tol = 1e-3;
     indexbound = abs(BESTPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
     intersection = find(indexbound);
     
         if ~isempty(intersection) 
-            coef = alpha(intersection(end));
-            nu(tMV/10) = coef(end);
+            coef = alpha(intersection(1));
+            nu(tMV/10) = coef(1);
         else 
             coef = alpha(end);
-            nu(tMV/10) = coef(end);
+            nu(tMV/10) = coef(1);
         end
         
         badindexbound = abs(BESTbadPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
@@ -86,16 +95,20 @@ for tMV = 10:10:90
             badcoef = alpha(badintersection(1));
             badnu(tMV/10) = badcoef(1);
         else 
-            badcoef = alpha(1);
+            badcoef = alpha(end);
             badnu(tMV/10) = badcoef(1);
         end
     
     figure(tMV/10)
-    semilogy(alpha, BESTPrecSTE,'-or')
+    semilogy(alpha, BESTNONys,'-og')
     hold on
     semilogy(alpha, BESTbadPrecSTE,'-dr')
     hold on
     semilogy(alpha, BESTBIGNys,'-ob')
+
+    xlabel('$\nu$', 'Interpreter','latex')
+    ylabel('error')
+    legend('error Nystrom+Lanczos', 'error Big Nystrom','bound Nystrom+Lanczos', 'conjecture Nystrom+Lanczos', 'bound Big Nystrom')
     
 end
 figure(100)

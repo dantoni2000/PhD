@@ -5,13 +5,13 @@ clear all
 close all
 warning off
 T = 100;
-n = 200;
+n = 2000;
 g = linspace(1,n,n)';
 mi = 1;
 ExperrtrBig=zeros(19,1);
 Experrtr1=zeros(19,1);
 
-A = diag(sqrt(rand(n,1).^2)); A = diag(sort(diag(A),'descend')); A = A./norm(A);
+A = diag(sqrt(rand(n,1).^.2)); A = diag(sort(diag(A),'descend')); A = A./norm(A);
 trA = sum(log(diag(A+mi*eye(n,n))),"all");
 
 for l=15:10:195
@@ -54,10 +54,17 @@ for tMV = 10:10:190
 end
 
 figure(1)
-semilogy(etr1,'r')
+semilogy(mvecs,etr1,'r')
 hold on
-semilogy(etrBig,'b')
+semilogy(mvecs,etrBig,'b')
 hold on
-semilogy(BESTbadPrecSTE','-dr')
+semilogy(mvecs,BESTbadPrecSTE','-dr')
 hold on
-semilogy(BESTBIGNys','-ob')
+semilogy(mvecs,BESTBIGNys','-ob')
+
+xlabel('MatVecs')
+ylabel('error')
+legend('error Nystrom+Lanczos', 'error Big Nystrom', 'conjecture Nystrom+Lanczos', 'bound Big Nystrom')
+
+figure(100)
+plot(diag(A))
