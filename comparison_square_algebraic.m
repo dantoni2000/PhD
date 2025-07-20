@@ -28,16 +28,16 @@ for l=15:10:95
         for t=1:T
         % Nystrom grande su A
         [UBig,LhatBig] = Nystrom(A,l);
-        ExperrtrBig((l-5)/10,j) = ExperrtrBig((l-5)/10,j) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA(j));
+        ExperrtrBig((l-5)/10,j) = ExperrtrBig((l-5)/10,j) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA(j)).^2;
     
         %Nystrom con 1 Hutch 5 Lanczos
         l1 = l-5;
         [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
-        Experrtr1((l-5)/10,j) = Experrtr1((l-5)/10,j) + abs(trr - trA(j));
+        Experrtr1((l-5)/10,j) = Experrtr1((l-5)/10,j) + abs(trr - trA(j)).^2;
         
         %Nystrom con n Hutch
         [~,trrNoPrec] = EST(A,mi,l/5,5,1);
-        ExperrtrNoPrec((l-5)/10,j) = ExperrtrNoPrec((l-5)/10,j) + abs(trrNoPrec - trA(j));
+        ExperrtrNoPrec((l-5)/10,j) = ExperrtrNoPrec((l-5)/10,j) + abs(trrNoPrec - trA(j)).^2;
 
         end
     
@@ -66,22 +66,17 @@ for tMV = 10:10:90
         k = s;
         p = tMV - s;
         
-        boundPrecSTE(:,s/2-1) = sqrt(2) .* (1./sqrt(2.*alpha-1) .* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + (k)/(p-1) ./sqrt(alpha-1).*(k+1).^(-alpha/2).*sqrt( (k.^(-alpha+1) - n.^(-alpha+1)) ) + (k.^(-alpha+1) - n.^(-alpha+1)) .* min(exp(1) .* sqrt(k+p)/p .* sqrt((k)/(p-1)),(k)/(p-1)) .* 1./(alpha-1));
-        boundBIGNys(:,s/2-1) = ((1 + (k+5)/(p-1)).*1./(alpha-1).*((k+5).^(-alpha+1) - n.^(-alpha+1)));
-        squareboundPrecSTE(:,s/2-1) = sqrt(4 .* ( (1+k^2/4 * (gamma(1/2)/gamma((s+1)/2))^(2/s)+k*(k+p-1)/(p*(p-1)*(p-3)) ).*(1./(2.*alpha-1).*(k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + k*(k+p-1)/(p*(p-1)*(p-3)) .*(1./(alpha-1).*( (k.^(-alpha+1) - n.^(-alpha+1)) )).^2 ));
-        squareboundBIGNys(:,s/2-1) = sqrt(2 .* ( (1+(k+5)^2/4 * (gamma(1/2)/gamma((s+1)/2))^(2/s) ).* ( 1./(alpha-1).*((k+5).^(-alpha+1) - n.^(-alpha+1)) ).^2 + 2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3)).* 1./(2.*alpha-1) .*  ((k+5).^(-2*alpha+1) - n.^(-2*alpha+1)) ));
-        badboundPrecSTE(:,s/2-1) = sqrt(2) .* ((1 + ((k)/(p-1))).*1./sqrt(2.*alpha-1).* sqrt( (k.^(-2*alpha+1) - n.^(-2*alpha+1)) ));
-    end
+        squareboundPrecSTE(:,s/2-1) = 4 .* ( (1+sqrt(exp(1)^5/2)*(k/(p+1))^2+k*(k+p-1)/(p*(p-1)*(p-3)) ).*(1./(2.*alpha-1).*(k.^(-2*alpha+1) - n.^(-2*alpha+1)) ) + k*(k+p-1)/(p*(p-1)*(p-3)) .*(1./(alpha-1).*( (k.^(-alpha+1) - n.^(-alpha+1)) )).^2 );
+        squareboundBIGNys(:,s/2-1) = 2 .* ( (1+sqrt(exp(1)^5/2)*((k+5)/(p+1))^2 ).* ( 1./(alpha-1).*((k+5).^(-alpha+1) - n.^(-alpha+1)) ).^2 + 2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3)).* 1./(2.*alpha-1) .*  ((k+5).^(-2*alpha+1) - n.^(-2*alpha+1)) );
+        
+     end
     
-    BESTPrecSTE = min(boundPrecSTE');
-    BESTBIGNys = min(boundBIGNys');
     BESTSquarePrecSTE = min(squareboundPrecSTE');
     BESTSquareBIGNys = min(squareboundBIGNys');
-    BESTbadPrecSTE = min(badboundPrecSTE');
-    BESTNONys = sqrt( 10/(tMV+5) .* ( zeta(2.*alpha) - 1./(2.*alpha-1) .* n.^(-2*alpha+1)) );
+    BESTSquareNONyst = 10/(tMV+5) .* (zeta(2.*alpha) - 1./(2.*alpha-1) .* n.^(-2*alpha+1));
     
-    tol = 1e-3;
-    indexbound = abs(BESTPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
+    tol = 5e-2;
+    indexbound = abs(BESTSquarePrecSTE - BESTSquareBIGNys)./abs(BESTSquareBIGNys) < tol;
     intersection = find(indexbound);
     
         if ~isempty(intersection) 
@@ -92,7 +87,7 @@ for tMV = 10:10:90
             nu(tMV/10) = coef(1);
         end
         
-        badindexbound = abs(BESTbadPrecSTE - BESTBIGNys)./abs(BESTBIGNys) < tol;
+        badindexbound = abs(BESTSquarePrecSTE - BESTSquareBIGNys)./abs(BESTSquareBIGNys) < tol;
         badintersection = find(badindexbound);
     
         if ~isempty(badintersection) 
@@ -104,20 +99,15 @@ for tMV = 10:10:90
         end
     
     figure(tMV/10)
-    semilogy(alpha, BESTNONys,'-og')
+    semilogy(alpha, BESTSquarePrecSTE,'-dr')
     hold on
-    semilogy(alpha, BESTPrecSTE,'-dr')
+    semilogy(alpha, BESTSquareBIGNys,'-ob')
     hold on
-    semilogy(alpha, BESTBIGNys,'-ob')
-    hold on    
-    semilogy(alpha, BESTSquarePrecSTE,'-dm')
-    hold on
-    semilogy(alpha, BESTSquareBIGNys,'-oc')
+    semilogy(alpha, BESTSquareNONyst,'-og')
 
     xlabel('$\nu$', 'Interpreter','latex')
     ylabel('error')
-    legend('error Nystrom+Lanczos', 'error Big Nystrom','bound Nystrom+Lanczos',...
-        'bound Big Nystrom','bound Square Nystrom+Lanczos','bound square Nystrom')
+    legend('error Nystrom+Lanczos', 'error Big Nystrom', 'error No Nystrom', 'bound Nystrom+Lanczos', 'bound Big Nystrom', 'bound no Nystrom')
     
 end
 figure(100)

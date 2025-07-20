@@ -4,7 +4,7 @@
 clear all
 close all
 warning off
-T = 100;
+T = 10;
 n = 1000;
 g = linspace(1,n,n)';
 mi = 1;

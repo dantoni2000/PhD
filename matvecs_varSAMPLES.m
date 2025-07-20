@@ -5,9 +5,9 @@ clear all
 close all
 warning off
 
-T = 30;
+T = 10;
 
-decadimento=7;
+decadimento=10;
 
 switch decadimento
     case 0
@@ -264,7 +264,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = diag(1./(g).^.9);
+        G = diag(1./(g).^.8);
         A = Q*G*Q';
         % A = G;
         figure(1)
