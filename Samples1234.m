@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=6;
+decadimento=4;
 
 switch decadimento
 
@@ -62,7 +62,7 @@ switch decadimento
     case 5
         n = 1000;
         mi = 1;
-        alpha = 1; nu = 3/2; % nu = 13/2;
+        alpha = 1; nu = 5/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
         data_matrix = randn(1,n);
         

@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=5;
+decadimento=1;
 
 switch decadimento
 
@@ -63,7 +63,7 @@ switch decadimento
     case 5
         n = 1000;
         mi = 1;
-        alpha = 1; nu = 5/2; % nu = 13/2;
+        alpha = 1; nu = 9/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
         data_matrix = randn(1,n);
         
@@ -128,6 +128,7 @@ switch decadimento
             x = sprand(n,1,0.01);
             A = A + (p/j^2*x) * x';
         end
+        A = 10^6 * A;
         [~,G,~]=svd(A);
         
         case 9
@@ -139,6 +140,7 @@ switch decadimento
                 A(i,j) = exp(-(x(i)-x(j))^2 / (2)^2);
             end
         end
+        A = 10^3*A;
         [~,G,~] = svd(A);
         
         case 10
@@ -152,7 +154,7 @@ end
 
 mi = 1;
 trA = sum(log(diag(G+mi*eye(n,n))),"all");
-nA = norm(A,'fro');
+nA = sum(log(1+diag(G)).^2).^0.5;
 nTr = zeros(19,1);
 nFro = zeros(19,1);
 nNoPrec = zeros(19,1);
@@ -195,32 +197,25 @@ for tMV = 10:10:190
         % boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* norm(G(k+1:n,k+1:n)) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2;
         % conjFro(:,s/2-1) = (1 + k/(p-1)).* norm(G(k+1:n,k+1:n),'fro');
 
-        squareboundTr(:,s/2-1) = sqrt( 2* (1+sqrt(exp(1)^5/2)*((k+5)/(p+1))^2 )* norm(G(k+5+1:n,k+5+1:n).^0.5,'fro')^4 + 2 * (k+5)*(k+5+p-1)/(p*(p-1)*(p-3)) * norm(G(k+5+1:n,k+5+1:n),'fro')^2);
-        squareboundFro(:,s/2-1) = sqrt( 4* (1+sqrt(exp(1)^5/2)*(k/(p+1))^2 + k*(k+p-1)/(p*(p-1)*(p-3)))* norm(G(k+1:n,k+1:n),'fro')^2 + k*(k+p-1)/(p*(p-1)*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4);
+        squareboundTr(:,s/2-1) = sqrt( 2* (1+sqrt(exp(1)^5/2)*((k+5)/(p+1))^2 )* sum(log(1+diag(G(k+5+1:n,k+5+1:n))))^2 + max(1,2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+5+1:n,k+5+1:n)).^2)));
+        squareboundFro(:,s/2-1) = sqrt( 4* sqrt( (1+sqrt(exp(1)^5/2)*(k/(p+1))^2)* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,sqrt(exp(1)^5/2)*(k/(p+1))^2) + k*(k+p-1)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
+        squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+sqrt(exp(1)^5/2)*(k/(p+1))^2)* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,12*sqrt(exp(1)^5/2)*(k/(p+1))^2))* G(k+1,k+1)^2 + max(1,(12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
         % squareboundSpec(:,s/2-1) = sqrt( 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* norm(G(k+1:n,k+1:n))^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4);
     end
 
     BestSqrtTr(tMV/10) = 1/mi * min(squareboundTr');
     BestSqrtFro(tMV/10) = 1/mi * min(squareboundFro');
-    BoundNoPrec(tMV/10) = 1/mi * sqrt(10/tMV)*nA;
+    BestSqrtFro_Spec(tMV/10) = 1/mi * min(squareboundFro_Spec');
+    BoundNoPrec(tMV/10) = 1/mi * sqrt(10/(tMV+5))*nA;
     % BestSqrtSpec(tMV/10) = min(squareboundSpec');
 
-    BestRkTr(tMV/10) = 1/mi * norm(diag(G(tMV+1:n,tMV+1:n)).^0.5,'fro').^2;
-    BestRkFro(tMV/10) = 1/mi * norm(diag(G(tMV+1:n,tMV+1:n)),'fro');
-    BestRkSpec(tMV/10) = 1/mi * norm((G(tMV+1:n,tMV+1:n)));
+    BestRkTr(tMV/10) = 1/mi * sum(diag(G(tMV+1:n,tMV+1:n)));
+    BestRkFro(tMV/10) = 1/mi * sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2));
+    BestRkSpec(tMV/10) = 1/mi * G(tMV+1,tMV+1);
 
-    check(tMV/10) = sum(diag(G(k+1:k+5,k+1:k+5))) / sum(diag(G(k+5+1:n,k+5+1:n)));
 
 end
-% figure(100)
-% plot(diag(A))
 
-% tipo qualcosa che dipende dal gap ex 1/(1+gap*l) (1+l) ||A-A_k+p+l||
-% for jj = 1:20
-%     ratio(jj) = nFro(end)./norm(diag(G(tMV+1+jj:n,tMV+1+jj:n)),'fro');
-% end
-% figure(4)
-% plot(ratio)
 
 figure(4)
 subplot('Position', [0.05 0.3 0.4 0.5])
@@ -240,10 +235,12 @@ semilogy(mvecs,nFro, '-r');
 hold on
 semilogy(mvecs,BestSqrtFro','-*m')
 hold on
+semilogy(mvecs,BestSqrtFro_Spec','-*k')
+hold on
 semilogy(mvecs,nNoPrec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
 hold on
 semilogy(mvecs,BoundNoPrec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
 xlabel('MatVecs')
 ylabel('error')
 title('Comparison of the bounds for the two strategies')
-legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'error (C)', 'bound (C)')
+legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'bound (B) spec', 'error (C)', 'bound (C)')
