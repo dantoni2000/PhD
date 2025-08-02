@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=8;
+decadimento=0;
 
 switch decadimento
 
@@ -193,7 +193,7 @@ for tMV = 10:10:90
         c2_star(:,s/2-1) = 2* (1+12*sqrt(exp(1)^5/2)*((k+5)/(p+1))^2)* norm(G(k+5+1:n,k+5+1:n))^2 + (12*exp(1)^4)*(k+5+p).^2/((p+1)^3*(p-3)) * norm(G(k+5+1:n,k+5+1:n).^0.5,'fro')^4;
     end
     
-    BestLowerTr(tMV/10) = (1+G(1,1))^-2.*((1 + min(c1_star') + 0.25*min(c2_star'))).^-1 .* norm((G(tMV+1:n,tMV+1:n)).^0.5,'fro')^4;
+    BestLowerTr(tMV/10) = (1+G(1,1))^-2.*((1 + min(c1_star'))).^-2 .* norm((G(tMV+1:n,tMV+1:n)).^0.5,'fro')^4;
     BestLowerFro(tMV/10) = 2*(1+G(1,1))^-2.*((1 + min(c1') + 0.25*min(c2'))).^-1 .* norm(G(tMV+1:n,tMV+1:n),'fro')^2;
     
 end

@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=5;
+decadimento=2;
 
 switch decadimento
 
@@ -180,19 +180,19 @@ for tMV = 10:10:190
         k = s;
         p = tMV - s;
         
-        boundTr(:,s/2-1) = (1 + k/(p-1)).* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2;
+        boundTr(:,s/2-1) = (1 + k/(p-1)).* sum(diag(G(k+1:n,k+1:n)));
         % boundFro(:,s/2-1) = (1 + sqrt(k/(p-1))).^2.* norm(G(k+1:n,k+1:n),'fro') ;
-        boundFro(:,s/2-1) = norm(G(k+1:n,k+1:n),'fro') + k/(p-1) .* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2 ;
-        boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* norm(G(k+1:n,k+1:n)) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2;
-        conjFro(:,s/2-1) = (1 + k/(p-1)).* norm(G(k+1:n,k+1:n),'fro');
+        boundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + k/(p-1) .* sum(diag(G(k+1:n,k+1:n))) ;
+        boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)));
+        conjFro(:,s/2-1) = (1 + k/(p-1)).* sqrt(sum(diag(G(k+1:n,k+1:n)).^2));
 
-        squareboundTr(:,s/2-1) = sqrt( 2* (1+sqrt(exp(1)^5/2)*(k/(p+1))^2 )* norm(G(k+1:n,k+1:n).^0.5,'fro')^4 + 2 * k*(k+p-1)/(p*(p-1)*(p-3)) * norm(G(k+1:n,k+1:n),'fro')^2);
-        squareboundFro(:,s/2-1) = sqrt( 4* (1+sqrt(exp(1)^5/2)*(k/(p+1))^2 + k*(k+p-1)/(p*(p-1)*(p-3)))* norm(G(k+1:n,k+1:n),'fro')^2 + k*(k+p-1)/(p*(p-1)*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4);
-        squareboundSpec(:,s/2-1) = sqrt( 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* norm(G(k+1:n,k+1:n))^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4);
+        squareboundTr(:,s/2-1) = sqrt( 2* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) )* sum(diag(G(k+1:n,k+1:n)))^2 + 2 * k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)).^2));
+        squareboundFro(:,s/2-1) = sqrt( 4* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3)))* sum(diag(G(k+1:n,k+1:n)).^2) + k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
+        squareboundSpec(:,s/2-1) = sqrt( 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* G(k+1,k+1)^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
         
-        LowerboundTr(:,s/2-1) = norm(diag(G(tMV+1:n,tMV+1:n)).^0.5,'fro').^2 ;
-        LowerboundFro(:,s/2-1) = norm(diag(G(tMV+1:n,tMV+1:n)),'fro') ;
-        LowerboundSpec(:,s/2-1) = norm((G(tMV+1:n,tMV+1:n))) ;
+        LowerboundTr(:,s/2-1) = sum(diag(G(tMV+1:n,tMV+1:n))) ;
+        LowerboundFro(:,s/2-1) = sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2)) ;
+        LowerboundSpec(:,s/2-1) = (G(tMV+1,tMV+1)) ;
     end
     
     BestTr(tMV/10) = min(boundTr');
@@ -204,9 +204,9 @@ for tMV = 10:10:190
     BestSqrtFro(tMV/10) = min(squareboundFro');
     BestSqrtSpec(tMV/10) = min(squareboundSpec');
 
-    BestRkTr(tMV/10) = norm(diag(G(tMV+1:n,tMV+1:n)).^0.5,'fro').^2;
-    BestRkFro(tMV/10) = norm(diag(G(tMV+1:n,tMV+1:n)),'fro');
-    BestRkSpec(tMV/10) = norm((G(tMV+1:n,tMV+1:n)));
+    BestRkTr(tMV/10) = sum(diag(G(tMV+1:n,tMV+1:n)));
+    BestRkFro(tMV/10) = sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2)) ;
+    BestRkSpec(tMV/10) = G(tMV+1,tMV+1);
 
     BestLowerTr(tMV/10) = max(LowerboundTr');
     BestLowerFro(tMV/10) = max(LowerboundFro');

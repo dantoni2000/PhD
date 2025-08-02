@@ -6,8 +6,8 @@ if flag2==0
     it = zeros(N,1);
     
     for i = 1:N
-        v = randsrc(n,1);
-        % v = randn(n,1);
+        % v = randsrc(n,1);
+        v = randn(n,1);
         [it(i),trr] = Lanczos_log(A,mi,v,m);
         tr = tr + trr(end,1);
         truetr = v'*logm(A+mi*eye(n))*v;
@@ -27,8 +27,8 @@ else
     it = zeros(N,1);
     
     for i = 1:N
-        v = randsrc(n,1);
-        % v = randn(n,1);
+        % v = randsrc(n,1);
+        v = randn(n,1);
         [it(i),trr] = Lanczos_log(A,mi,v,m);
         tr = tr + trr(end,1);
     end

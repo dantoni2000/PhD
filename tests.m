@@ -1,7 +1,7 @@
 clear all
 close all
 
-n = 100; k = 20; maxp = 10; T = 1000;
+n = 100; k = 80; maxp = 10; T = 1000;
 
 expct = zeros(maxp,1);
 
@@ -14,6 +14,8 @@ for p = 1:maxp
         TnpinvOmega(p,t) = norm(pinvOmega,'fro')^2;
         FourthTnpinvOmega(p,t) = norm(pinvOmega,'fro')^4;
         S4TnpinvOmega(p,t) = norm(pinvOmega'*pinvOmega,'fro')^2;
+
+        rap(p,t) = norm(pinvOmega)/norm(pinvOmega,'fro');
     end
 
     SpecnpinvOmega(p,1) = 1/T * sum(SpecpinvOmega(p,1:end));
@@ -27,6 +29,7 @@ for p = 1:maxp
 
     if p>4
         Fourthexpct(p,1) = sqrt(exp(1)^5/2)*(k/(p))^2;
+        DavidFourthexpct(p,1) = k*(k*(p-1)-2*k+2)/((p-1)*(p-2)*(p-4));
         S4expct(p,1) = (k*(k+p-2))/((p-1)*(p-2)*(p-4));
     end
 end

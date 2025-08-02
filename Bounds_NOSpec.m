@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=1;
+decadimento=8;
 
 switch decadimento
 
@@ -63,7 +63,7 @@ switch decadimento
     case 5
         n = 1000;
         mi = 1;
-        alpha = 1; nu = 9/2; % nu = 13/2;
+        alpha = 1; nu = 5/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
         data_matrix = randn(1,n);
         
@@ -190,17 +190,14 @@ for tMV = 10:10:190
     for s = 4:2:tMV-4
         k = s;
         p = tMV - s;
-        
-        % boundTr(:,s/2-1) = (1 + k/(p-1)).* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2;
-        % boundFro(:,s/2-1) = (1 + sqrt(k/(p-1))).^2.* norm(G(k+1:n,k+1:n),'fro') ;
-        % boundFro(:,s/2-1) = norm(G(k+1:n,k+1:n),'fro') + k/(p-1) .* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2 ;
-        % boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* norm(G(k+1:n,k+1:n)) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* norm(G(k+1:n,k+1:n).^0.5 ,'fro')^2;
-        % conjFro(:,s/2-1) = (1 + k/(p-1)).* norm(G(k+1:n,k+1:n),'fro');
 
-        squareboundTr(:,s/2-1) = sqrt( 2* (1+sqrt(exp(1)^5/2)*((k+5)/(p+1))^2 )* sum(log(1+diag(G(k+5+1:n,k+5+1:n))))^2 + max(1,2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+5+1:n,k+5+1:n)).^2)));
-        squareboundFro(:,s/2-1) = sqrt( 4* sqrt( (1+sqrt(exp(1)^5/2)*(k/(p+1))^2)* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,sqrt(exp(1)^5/2)*(k/(p+1))^2) + k*(k+p-1)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
-        squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+sqrt(exp(1)^5/2)*(k/(p+1))^2)* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,12*sqrt(exp(1)^5/2)*(k/(p+1))^2))* G(k+1,k+1)^2 + max(1,(12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
-        % squareboundSpec(:,s/2-1) = sqrt( 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* norm(G(k+1:n,k+1:n))^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4);
+        squareboundTr(:,s/2-1) = sqrt( 2* (1+(k+5)*((k+5)*p-2*(k+5)+2)/(p*(p-1)*(p-3)) )* sum(log(1+diag(G(k+5+1:n,k+5+1:n))))^2 + 2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+5+1:n,k+5+1:n)).^2)));
+         
+        squareboundFro(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,k*(k*p-2*k+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3))))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
+        squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt( log(1+G(k+1,k+1))^2 + (max(1,k*(k*p-2*k+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3))))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
+
+
+        %squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,12*k*(k*p-2*k+2)/(p*(p-1)*(p-3))))* G(k+1,k+1)^2 + max(1,(12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
     end
 
     BestSqrtTr(tMV/10) = 1/mi * min(squareboundTr');
