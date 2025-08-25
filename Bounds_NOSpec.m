@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=8;
+decadimento=0;
 
 switch decadimento
 

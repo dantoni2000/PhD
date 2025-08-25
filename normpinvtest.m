@@ -47,3 +47,7 @@ semilogy(1/T*sum(rap1(12,1:end))*ones(1,T))
 % semilogy(FroSpec(1,:))
 % hold on
 % semilogy(1/T*sum(FroSpec(1,1:end))*ones(1,T))
+
+perc2 = sum(rap2(:,1:end)'>1);
+perc1_5 = sum(rap1_5(:,1:end)'>1);
+perc1 = sum(rap1(:,1:end)'>1);

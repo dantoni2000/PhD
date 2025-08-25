@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=4;
+decadimento=8;
 
 switch decadimento
 
@@ -13,7 +13,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = diag((-g+g(n,1)+1)./g(n,1));
+        G = 10^3*diag((-g+g(n,1)+1)./g(n,1));
         A = Q*G*Q';
                 
         % figure(2)
@@ -26,7 +26,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = diag(1./(g).^.85);
+        G = 10^3*diag(1./(g).^.85);
         A = Q*G*Q';
         % A = G;
 
@@ -35,7 +35,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = 10000 * diag(1./sqrt(g));
+        G = 10^3 * diag(1./sqrt(g));
         A = Q*G*Q';
         % A = G;
 
@@ -44,7 +44,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = diag(exp(-.1*g));
+        G = 10^4*diag(exp(-.25*g));
         A = Q*G*Q';
         % A = G;
 
@@ -55,14 +55,14 @@ switch decadimento
         data_matrix = orth(randn(n,n))*diag(1:n);
         A = build_kernel_matrix(data_matrix,kernel);
         [Q,G] = svd(A);
-        G=diag(diag(G));
+        G=10^6*diag(diag(G));
         A = Q*G*Q'; 
         % A = G;
         
     case 5
         n = 1000;
         mi = 1;
-        alpha = 1; nu = 5/2; % nu = 13/2;
+        alpha = 1; nu = 3/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
         data_matrix = randn(1,n);
         
@@ -85,13 +85,13 @@ switch decadimento
         end
 
         [Q,G] = svd(A);
-        G=diag(diag(G));
+        G=10^6*diag(diag(G));
         A = Q*G*Q'; 
         % A = G;
         
     case 6
         n = 1000; mi = 1;
-        G = 100*sparse(diag((1:n).^(-2)));
+        G = 10^5*sparse(diag((1:n).^(-2)));
         % Q = gallery('orthog',n,1);
         [Q,~] = qr(randn(n,n));
         A = Q*G*Q';  
@@ -99,7 +99,7 @@ switch decadimento
         
     case 7
         n = 1000; mi = 1;
-        G = sparse(diag(exp(-(1:n)/100)));
+        G = 10^4*sparse(diag(exp(-(1:n)/100)));
         % D = sparse(diag((1:matrix_size)).^(-3));
         % Q = gallery('orthog',n,1);
         [Q,~] = qr(randn(n,n));
@@ -127,6 +127,7 @@ switch decadimento
             x = sprand(n,1,0.01);
             A = A + (p/j^2*x) * x';
         end
+        A = 10^6 * A;
         [~,G,~]=svd(A);
         
         case 9
@@ -138,6 +139,7 @@ switch decadimento
                 A(i,j) = exp(-(x(i)-x(j))^2 / (2)^2);
             end
         end
+        A = 10^3 * A;
         [~,G,~] = svd(A);
         
         case 10

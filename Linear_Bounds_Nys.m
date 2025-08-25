@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=2;
+decadimento=3;
 
 switch decadimento
 
@@ -26,7 +26,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = diag(1./(g).^5);
+        G = diag(1./(g).^.05);
         A = Q*G*Q';
         % A = G;
 
@@ -184,7 +184,8 @@ for tMV = 10:10:190
         % boundFro(:,s/2-1) = (1 + sqrt(k/(p-1))).^2.* norm(G(k+1:n,k+1:n),'fro') ;
         boundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + k/(p-1) .* sum(diag(G(k+1:n,k+1:n))) ;
         boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)));
-        conjFro(:,s/2-1) = (1 + k/(p-1)).* sqrt(sum(diag(G(k+1:n,k+1:n)).^2));
+        % conjFro(:,s/2-1) = (1 + k/(p-1)).* sqrt(sum(diag(G(k+1:n,k+1:n)).^2));
+        conjFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
 
         squareboundTr(:,s/2-1) = sqrt( 2* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) )* sum(diag(G(k+1:n,k+1:n)))^2 + 2 * k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)).^2));
         squareboundFro(:,s/2-1) = sqrt( 4* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3)))* sum(diag(G(k+1:n,k+1:n)).^2) + k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
