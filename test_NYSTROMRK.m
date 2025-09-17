@@ -5,8 +5,8 @@ clear all
 n = 1000;
 Q = randn(n,n); [Q,~] = qr(Q);
 g=linspace(1,n,n);
- G = diag(1+1./g.^-0.5);
-%G = diag(1+exp(-g)); %se ne prendo qualcuno in modo arbitrario non è terribile...
+% G = diag(1./g.^-5);
+G = diag(exp(-g)); %se ne prendo qualcuno in modo arbitrario non è terribile...
 A = Q*G*Q';
 v=ones(n,1);
 w=ones(n,1);

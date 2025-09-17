@@ -2,36 +2,42 @@ clear all
 close all
 warning off
 
-T = 100;
+T = 30;
 
 % n = 500;
 n = 1000;
 Q = randn(n,n); [Q,~] = qr(Q);
 g = linspace(1,n,n)';
 mi = 1;
-sigma = 1e-4;
-nTr = zeros(49,1);
+sigma = 1e-6;
+nTr = zeros(21,1);
+rk = 490;
+G = diag([ones(1,rk), sigma*ones(1,n-rk)]);
 
-for l=10:10:490
+% g = linspace(1,rk,rk)';
+% g4 = (1./(g').^.5);
+% G = diag([max(g4,sigma), sigma*ones(1,n-rk)]);
 
-    mvecs( l/10 ) = l;
-    G = diag([ones(1,l), sigma*ones(1,n-l)]);
-    A = Q*G*Q';        
+A = Q*G*Q'; 
+
+for l=1:1:21
+    ll = 479 + l;
+    mvecs( l ) = ll;      
     for t=1:T
     % Nystrom grande su A
-    [UBig,LhatBig] = PinvNystrom(A,l);
+    [UBig,LhatBig] = PinvNystrom(A,ll);
     B = A-UBig*LhatBig*UBig';
-    nTr(l/10,t) = trace(B);
+    nTr(l,t) = trace(B);
     end
     
 
 end
 nTr = median(nTr,2);
 
-for tMV = 10:10:490
-    G = diag([ones(1,tMV), sigma*ones(1,n-tMV)]);
-    BestRkTr(tMV/10) = sum(diag(G(tMV+1:n,tMV+1:n)));
-    denom(tMV/10) = 1/tMV + 3 * sigma *(n-tMV);
+for tMV = 1:1:21
+    ttMV = 479 + tMV;
+    BestRkTr(tMV) = sum(diag(G(ttMV+1:n,ttMV+1:n)));
+    denom(tMV) = min( 1/ttMV + (3/G(ttMV,ttMV)) * BestRkTr(tMV), 1) ;
 end
 
 figure(1)

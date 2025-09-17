@@ -12,8 +12,8 @@ if flag2==0
     % lgPAP = logm(P*(A+mi*eye(n))*P);
     
     for i = 1:N
-        % v = randsrc(n,1);
-        v = randn(n,1);
+        v = randsrc(n,1);
+        % v = randn(n,1);
         [Pit(i),tr] = Nystrom_Lanczos_log(A,mi,U,Lhat,v,m);
         Ptr = Ptr + tr(end,1);
         truetr = v'*logm(P*(A+mi*eye(n))*P)*v;
@@ -44,8 +44,8 @@ else
     Pp = sum(log(diag(Lhat+mi*eye(s,s))),"all");
     
     for i = 1:N
-        % v = randsrc(n,1);
-        v = randn(n,1);
+        v = randsrc(n,1);
+        % v = randn(n,1);
         [Pit(i),tr] = Nystrom_Lanczos_log(A,mi,U,Lhat,v,m);
         % P = (mi)^0.5*U*(Lhat+mi*eye(s))^-0.5*U' + (eye(n) - U*U');
         % tr(end,1) - trace(logm(P*(A+eye(n))*P))

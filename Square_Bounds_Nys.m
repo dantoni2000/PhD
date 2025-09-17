@@ -182,7 +182,7 @@ for tMV = 10:10:190
         
         squareboundTr(:,s/2-1) = 2* (1+sqrt(exp(1)^5/2)*(k/(p+1))^2 )* norm(G(k+1:n,k+1:n).^0.5,'fro')^4 + 2 * k*(k+p-1)/(p*(p-1)*(p-3)) * norm(G(k+1:n,k+1:n),'fro')^2 ;
         squareboundFro(:,s/2-1) = 4* (1+sqrt(exp(1)^5/2)*(k/(p+1))^2 + k*(k+p-1)/(p*(p-1)*(p-3)))* norm(G(k+1:n,k+1:n),'fro')^2 + k*(k+p-1)/(p*(p-1)*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4 ;
-        squareboundSpec(:,s/2-1) = 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* norm(G(k+1:n,k+1:n))^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4;
+        squareboundSpec(:,s/2-1) = 2* (1+18*sqrt(exp(1)^5/2)*(k/(p+1))^2)* norm(G(k+1:n,k+1:n))^2 + (18*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * norm(G(k+1:n,k+1:n).^0.5,'fro')^4;
 
         LowerboundTr(:,s/2-1) = norm(diag(G(tMV+1:n,tMV+1:n)).^0.5,'fro').^4 ;
         LowerboundFro(:,s/2-1) = norm(diag(G(tMV+1:n,tMV+1:n)),'fro').^2 ;

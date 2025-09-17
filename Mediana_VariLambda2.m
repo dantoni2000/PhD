@@ -2,9 +2,9 @@ clear all
 close all
 warning off
 
-T = 1000;
+T = 100;
 
-n = 100;
+n = 1000;
 % sigma = 1e-9;
 sigma = 1e-6;
 % sigma = 1e-3;
@@ -19,7 +19,7 @@ nTr4 = zeros(9,T);
 
 nTr5 = zeros(9,T);
 
-for l=10:10:90
+for l=10:10:490
 
     mvecs(l/10) = l;
     g = linspace(1,n-l,n-l);
@@ -88,35 +88,37 @@ nTr4 = median(nTr4,2);
 
 nTr5 = median(nTr5,2);
 
-for tMV = 10:10:90
+for tMV = 10:10:490
 
     g = linspace(1,n-tMV,n-tMV);
 
     %caso peggiore
     G1 = diag([ones(1,tMV), sigma*ones(1,n-tMV)]);
     BestRkTr1(tMV/10) = sum(diag(G1(tMV+1:n,tMV+1:n)));
-
+    denom1(tMV/10) = 2/(tMV/0.5) + 3 * BestRkTr1(tMV/10);
 
     %slow decay
     g2 = (-g+g(n-tMV)+1)./g(n-tMV);
     G2 = diag([ones(tMV,1); sigma*g2']);
     BestRkTr2(tMV/10) = sum(diag(G2(tMV+1:n,tMV+1:n)));
-
+    denom2(tMV/10) = 2/(tMV/0.5) + 3 * BestRkTr2(tMV/10);
 
     %fast decay
     g3 = (1./(g).^5);
     G3 = diag([ones(tMV,1); sigma*g3']);
     BestRkTr3(tMV/10) = sum(diag(G3(tMV+1:n,tMV+1:n)));
-    
+    denom3(tMV/10) = 2/(tMV/0.5) + 3 * BestRkTr3(tMV/10);
     
     %slow decay
     g4 = (1./(g).^.5);
     G4 = diag([ones(tMV,1); sigma*g4']);
     BestRkTr4(tMV/10) = sum(diag(G4(tMV+1:n,tMV+1:n)));
+    denom4(tMV/10) = 2/(tMV/0.5) + 3 * BestRkTr4(tMV/10);
    
     %caso migliore
     G5 = diag([ones(tMV,1); sigma; zeros(n-tMV-1,1)]);
     BestRkTr5(tMV/10) = sum(diag(G5(tMV+1:n,tMV+1:n)));
+    denom5(tMV/10) = 2/(tMV/0.5) + 3 * BestRkTr5(tMV/10);
 end
 
 
@@ -164,3 +166,48 @@ semilogy(diag(G4),'r')
 hold on
 semilogy(diag(G5),'k')
 legend('case 1', 'case 2', 'case 3', 'case 4', 'case 5', 'interpreter', 'Latex')
+
+figure(5)
+semilogy(mvecs,nTr1'./BestRkTr1,'-db')
+hold on
+semilogy(mvecs,1./denom1,'-c')
+xlabel('MatVecs')
+ylabel('error')
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|A_2 \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')
+
+figure(6)
+semilogy(mvecs,nTr2'./BestRkTr2,'-db')
+hold on
+semilogy(mvecs,1./denom2,'-c')
+xlabel('MatVecs')
+ylabel('error')
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|A_2 \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')
+
+figure(7)
+semilogy(mvecs,nTr3'./BestRkTr3,'-db')
+hold on
+semilogy(mvecs,1./denom3,'-c')
+xlabel('MatVecs')
+ylabel('error')
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|A_2 \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')
+
+figure(8)
+semilogy(mvecs,nTr4'./BestRkTr4,'-db')
+hold on
+semilogy(mvecs,1./denom4,'-c')
+xlabel('MatVecs')
+ylabel('error')
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|A_2 \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')
+
+figure(9)
+semilogy(mvecs,nTr5'./BestRkTr5,'-db')
+hold on
+semilogy(mvecs,1./denom5,'-c')
+xlabel('MatVecs')
+ylabel('error')
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|A_2 \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')

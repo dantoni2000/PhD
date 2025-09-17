@@ -20,6 +20,7 @@ for x = 1:1:20
         s=@(x)(sqrt(m./(m+1))*1./(2*sqrt(x)).*exp(-x.*(1-1./(2*m))));
         r=@(x)(sqrt(m)/sqrt(m+1) *(1+sqrt(x))./(2*sqrt(x)).*exp(-x/2-sqrt(x)));
         integral(s,0,2)
+        sqrt(m*pi)/(2*sqrt((m+1)*(1-1/(2*m))))*erf(sqrt((1-1/(2*m))*2))
         integral(r,0,2)
 
   %       bah = @(u) ( ...

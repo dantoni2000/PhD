@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=3;
+decadimento=8;
 
 switch decadimento
 
@@ -26,7 +26,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = diag(1./(g).^.05);
+        G = diag(1./(g).^5);
         A = Q*G*Q';
         % A = G;
 
@@ -128,6 +128,8 @@ switch decadimento
             A = A + (p/j^2*x) * x';
         end
         [~,G,~]=svd(A);
+        A = A/G(1,1);
+        G = G/G(1,1);
         
         case 9
         n = 1000;
@@ -145,7 +147,8 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = eye(n);
+        sigma = 1e-6;
+        G = diag([1;sigma*ones(n-1,1)]);
         A = Q*G*Q';
         
 end
@@ -183,13 +186,24 @@ for tMV = 10:10:190
         boundTr(:,s/2-1) = (1 + k/(p-1)).* sum(diag(G(k+1:n,k+1:n)));
         % boundFro(:,s/2-1) = (1 + sqrt(k/(p-1))).^2.* norm(G(k+1:n,k+1:n),'fro') ;
         boundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + k/(p-1) .* sum(diag(G(k+1:n,k+1:n))) ;
-        boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)));
+        boundSpec(:,s/2-1) = (1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)));        
+        % logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + sqrt(k.^2.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        % logboundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        % logboundSpec(:,s/2-1) = G(k+1,k+1) + sqrt((log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + sqrt(k.^2.* (log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        % logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + k.* min ( sqrt((log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2), sqrt((log(1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n))))^2));
+
+        logboundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k.* (log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        % logboundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k).* min ( sqrt((log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2), sqrt((log(1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n))))^2));
+        
+        logboundSpec(:,s/2-1) = G(k+1,k+1) + sqrt((log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        % logboundSpec(:,s/2-1) = G(k+1,k+1) + min ( sqrt((log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2), sqrt((log(1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n))))^2));
+        
         % conjFro(:,s/2-1) = (1 + k/(p-1)).* sqrt(sum(diag(G(k+1:n,k+1:n)).^2));
-        conjFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
 
         squareboundTr(:,s/2-1) = sqrt( 2* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) )* sum(diag(G(k+1:n,k+1:n)))^2 + 2 * k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)).^2));
         squareboundFro(:,s/2-1) = sqrt( 4* (1+(k)*((k)*p-2*(k)+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3)))* sum(diag(G(k+1:n,k+1:n)).^2) + k*(k+p-1)/(p*(p-1)*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
-        squareboundSpec(:,s/2-1) = sqrt( 2* (1+12*sqrt(exp(1)^5/2)*(k/(p+1))^2)* G(k+1,k+1)^2 + (12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
+        squareboundSpec(:,s/2-1) = sqrt( 2* (1+18*sqrt(exp(1)^5/2)*(k/(p+1))^2)* G(k+1,k+1)^2 + (18*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3)) * sum(diag(G(k+1:n,k+1:n)))^2);
         
         LowerboundTr(:,s/2-1) = sum(diag(G(tMV+1:n,tMV+1:n))) ;
         LowerboundFro(:,s/2-1) = sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2)) ;
@@ -199,7 +213,11 @@ for tMV = 10:10:190
     BestTr(tMV/10) = min(boundTr');
     BestFro(tMV/10) = min(boundFro');
     BestSpec(tMV/10) = min(boundSpec');
-    ConjFro(tMV/10) = min(conjFro');
+
+
+    LogBoundTr(tMV/10) = min(logboundTr');
+    LogBoundFro(tMV/10) = min(logboundFro');
+    LogBoundSpec(tMV/10) = min(logboundSpec');
 
     BestSqrtTr(tMV/10) = min(squareboundTr');
     BestSqrtFro(tMV/10) = min(squareboundFro');
@@ -229,7 +247,7 @@ semilogy(mvecs,nFro,'r')
 hold on
 semilogy(mvecs,BestFro','-or')
 hold on
-semilogy(mvecs,ConjFro','-og')
+semilogy(mvecs,LogBoundFro','-og')
 hold on
 semilogy(mvecs,BestSqrtFro','-om')
 hold on
@@ -243,7 +261,7 @@ hold on
 xlabel('MatVecs')
 ylabel('error')
 title('Comparison of the bounds for Nystrom in Frobenius Norm')
-legend('error Nystrom', 'bound Nystrom', 'conjecture Nystrom', 'square root of square bound Nystrom', 'best Rk k')
+legend('error Nystrom', 'bound Nystrom', 'bound with logarithm', 'square root of square bound Nystrom', 'best rank k', 'fontsize', 18)
 
 
 figure(2)
@@ -260,6 +278,8 @@ semilogy(mvecs,nTr,'b')
 hold on
 semilogy(mvecs,BestTr','-ob')
 hold on
+semilogy(mvecs,LogBoundTr','-og')
+hold on
 semilogy(mvecs,BestSqrtTr','-oc')
 % hold on
 % semilogy(mvecs,BestRkTr','-*k')
@@ -268,7 +288,7 @@ semilogy(mvecs,BestLowerTr','-dk')
 xlabel('MatVecs')
 ylabel('error')
 title('Comparison of the bounds for Nystrom in Nuclear norm')
-legend('error Nystrom', 'bound Nystrom', 'square root of square bound Nystrom','best Rk k')
+legend('error Nystrom', 'bound Nystrom', 'bound with logarithm', 'square root of square bound Nystrom','best rank k', 'fontsize', 18)
 
 
 figure(3)
@@ -285,6 +305,8 @@ semilogy(mvecs,nSpec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.635
 hold on
 semilogy(mvecs,BestSpec','-o', 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
 hold on
+semilogy(mvecs,LogBoundSpec','-og')
+hold on
 semilogy(mvecs,BestSqrtSpec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
 % hold on
 % semilogy(mvecs,BestRkTr','-*k')
@@ -293,7 +315,7 @@ semilogy(mvecs,BestLowerSpec','-dk')
 xlabel('MatVecs')
 ylabel('error')
 title('Comparison of the bounds for Nystrom in Spectral norm')
-legend('error Nystrom', 'bound Nystrom', 'square root of square bound Nystrom','best Rk k')
+legend('error Nystrom', 'bound Nystrom', 'bound with logarithm', 'square root of square bound Nystrom','best rank k', 'fontsize', 18)
 
 % figure(100)
 % plot(diag(A))

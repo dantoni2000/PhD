@@ -2,7 +2,7 @@ clear all
 close all
 warning off
 
-T = 30;
+T = 10;
 
 decadimento=5;
 
@@ -44,7 +44,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = 10^4*diag(exp(-.25*g));
+        G = 10^3*diag(exp(-.25*g));
         % G = 1000*diag(exp(-.1*g));
         A = Q*G*Q';
         % A = G;
@@ -153,9 +153,10 @@ end
 mi = 1;
 trA = sum(log(diag(G+mi*eye(n,n))),"all");
 nA = norm(A,'fro');
-nTr = zeros(19,1);
-nFro = zeros(19,1);
-nNoPrec = zeros(19,1);
+nTr = zeros(19,1); stDevnTr  = zeros(19,1);
+nFro = zeros(19,1); stDevnFro  = zeros(19,1);
+nNoPrec = zeros(19,1); stDevnNoPrec  = zeros(19,1);
+nxNys = zeros(19,1);
 
 for l=15:10:195
         
@@ -165,15 +166,20 @@ for l=15:10:195
         % Nystrom grande su A
         [UBig,LhatBig] = PinvNystrom(A,l);
         nTr((l-5)/10) = nTr((l-5)/10) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA);
-        
+        stDevnTr((l-5)/10) = stDevnTr((l-5)/10) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA).^2;
+
         %Nystrom con 1 Hutch 5 Lanczos
         l1 = l-5;
         [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
         nFro((l-5)/10) = nFro((l-5)/10) + abs(trr - trA);
         
         %Nystrom con n Hutch
-        [~,trrNoPrec] = EST(A,mi,l/5,5,1);
+        [~,trrNoPrec] = EST(A,mi,5,l/5,1);
         nNoPrec((l-5)/10) = nNoPrec((l-5)/10) + abs(trrNoPrec - trA);
+
+        % % Per ora xnystrace con f esatta. Come si mette f in xnystrace?
+        % [xnys,~] = xnystrace(logm(A+eye(n)), l1);
+        % nxNys((l-5)/10) = nxNys((l-5)/10) + abs(xnys - trA);
 
     end
 
@@ -182,6 +188,7 @@ end
 nFro = 1/T * nFro;
 nTr = 1/T * nTr;
 nNoPrec = 1/T * nNoPrec;
+nxNys = 1/T * nxNys;
 
 for tMV = 10:10:190
 
@@ -243,7 +250,9 @@ hold on
 semilogy(mvecs,nNoPrec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
 hold on
 semilogy(mvecs,BoundNoPrec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
+hold on
+% semilogy(mvecs,nxNys, '-k')
 xlabel('MatVecs')
 ylabel('error')
 title('Comparison of the bounds for the two strategies')
-legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'error (C)', 'bound (C)')
+legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'error (C)', 'bound (C)','fontsize',18)
