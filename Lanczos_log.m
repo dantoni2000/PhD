@@ -1,7 +1,4 @@
-function [its,tr] = Lanczos_log(A,mi,x,m)
-
-tolrel = 1e-10;
-tolabs = 1e-10;
+function [its,tr] = Lanczos_log(A,mi,x,m,tolrel,tolabs)
 its = m;
 tr(1,1) = 0; 
 

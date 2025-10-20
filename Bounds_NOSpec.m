@@ -2,9 +2,10 @@ clear all
 close all
 warning off
 
-T = 30;
+T = 20;
+S = [];
 
-decadimento=6;
+decadimento=5;
 
 switch decadimento
 
@@ -13,7 +14,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = 10^3*diag((-g+g(n,1)+1)./g(n,1));
+        G = 10^2*diag((-g+g(n,1)+1)./g(n,1));
         A = Q*G*Q';
                 
         % figure(2)
@@ -26,7 +27,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = 10^3*diag(1./(g).^.85);
+        G = 10^2*diag(1./(g).^.85);
         A = Q*G*Q';
         % A = G;
 
@@ -44,7 +45,7 @@ switch decadimento
         Q = randn(n,n); [Q,~] = qr(Q);
         g = linspace(1,n,n)';
         mi = 1;
-        G = 10^6*diag(exp(-.25*g));
+        G = 10^10*diag(exp(-.125*g));
         % G = 1000*diag(exp(-.1*g));
         A = Q*G*Q';
         % A = G;
@@ -61,7 +62,7 @@ switch decadimento
         % A = G;
         
     case 5
-        n = 1000;
+        n = 5000;
         mi = 1;
         alpha = 1; nu = 5/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
@@ -87,12 +88,13 @@ switch decadimento
 
         [Q,G] = svd(A);
         G=10^6*diag(diag(G));
+        % G = G + .1*eye(n);
         A = Q*G*Q'; 
         % A = G;
         
     case 6
-        n = 1000; mi = 1;
-        G = 10^5*(diag((1:n).^(-2)));
+        n = 5000; mi = 1;
+        G = 10^6*(diag((1:n).^(-2)));
         % Q = gallery('orthog',n,1);
         [Q,~] = qr(randn(n,n));
         A = Q*G*Q';  
@@ -129,6 +131,7 @@ switch decadimento
             A = A + (p/j^2*x) * x';
         end
         A = 10^6 * A;
+        % A = A + .5*eye(n);
         [~,G,~]=svd(A);
         
         case 9
@@ -155,32 +158,45 @@ end
 mi = 1;
 trA = sum(log(diag(G+mi*eye(n,n))),"all");
 nA = sum(log(1+diag(G)).^2).^0.5;
-nTr = zeros(19,1); stDevnTr  = zeros(19,1);
-nFro = zeros(19,1); stDevnFro  = zeros(19,1);
-nNoPrec = zeros(19,1); stDevnNoPrec  = zeros(19,1);
+nTr = zeros(21,1); stDevnTr  = zeros(21,1);
+nFro = zeros(21,1); stDevnFro  = zeros(21,1);
+nNoPrec = zeros(21,1); stDevnNoPrec  = zeros(21,1);
 
-for l=15:10:195
-        
-    mvecs((l-5)/10 ) = l;
+for l=25:100:2025
+    mvecs((l+75)/100 ) = l
         
     for t=1:T
-        % Nystrom grande su A
-        [UBig,LhatBig] = PinvNystrom(A,l);
-        nTr((l-5)/10) = nTr((l-5)/10) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA);
-        stDevnTr((l-5)/10) = stDevnTr((l-5)/10) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA).^2;
+        % % Nystrom grande su A
+        % [UBig,LhatBig] = PinvNystrom(A,l);
+        % nTr((l+75)/100) = nTr((l+75)/100) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA);
+        % stDevnTr((l+75)/100) = stDevnTr((l+75)/100) + abs(sum(log(diag(LhatBig+mi*eye(l,l))),"all") - trA).^2;
+
+
+        %Nystrom con 1 Hutch 5 Lanczos
+        l1 = l-5;
+        [~,trrDavid] = Nystrom_HUTCH(A,mi,l1/2+5,l1/10,5,1,1);
+        nTr((l+75)/100) = nTr((l+75)/100) + abs(trrDavid - trA);
+        stDevnTr((l+75)/100) = stDevnTr((l+75)/100) + abs(trrDavid - trA).^2;
 
         %Nystrom con 1 Hutch 5 Lanczos
         l1 = l-5;
         [~,trr] = Nystrom_HUTCH(A,mi,l1,1,5,1,1);
-        nFro((l-5)/10) = nFro((l-5)/10) + abs(trr - trA);
-        stDevnFro((l-5)/10) = stDevnFro((l-5)/10) + abs(trr - trA).^2;
+        nFro((l+75)/100) = nFro((l+75)/100) + abs(trr - trA);
+        stDevnFro((l+75)/100) = stDevnFro((l+75)/100) + abs(trr - trA).^2;
 
         %Nystrom con n Hutch
-        [~,trrNoPrec] = EST(A,mi,5,l/5,1);
-        nNoPrec((l-5)/10) = nNoPrec((l-5)/10) + abs(trrNoPrec - trA);
-        stDevnNoPrec((l-5)/10) = stDevnNoPrec((l-5)/10) + abs(trrNoPrec - trA).^2;
+
+        %Lanczos estimate
+        its = EST(A,mi,1,n,1,1e-6,1e-6);
+        s = floor(l/its)+1;
+       
+
+        [~,trrNoPrec] = EST(A,mi,s,its,1);
+        nNoPrec((l+75)/100) = nNoPrec((l+75)/100) + abs(trrNoPrec - trA);
+        stDevnNoPrec((l+75)/100) = stDevnNoPrec((l+75)/100) + abs(trrNoPrec - trA).^2;
 
     end
+     S = [S;s];
 
 end
  
@@ -191,12 +207,11 @@ nFro = 1/T * nFro;
 stDevnNoPrec = (1/(T*(T-1)) * (stDevnNoPrec - nNoPrec.^2 / T)).^0.5;
 nNoPrec = 1/T * nNoPrec;
 
-for tMV = 10:10:190
+for tMV = 20:100:2020
 
     for s = 4:2:tMV-4
         k = s;
         p = tMV - s;
-
         squareboundTr(:,s/2-1) = sqrt( 2* (1+(k+5)*((k+5)*p-2*(k+5)+2)/(p*(p-1)*(p-3)) )* sum(log(1+diag(G(k+5+1:n,k+5+1:n))))^2 + 2*(k+5)*(k+5+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+5+1:n,k+5+1:n)).^2))); 
         squareboundFro(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,k*(k*p-2*k+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3))))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
         squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt( log(1+G(k+1,k+1))^2 + (max(1,k*(k*p-2*k+2)/(p*(p-1)*(p-3)) + k*(k+p-1)/(p*(p-1)*(p-3))))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + max(1,k*(k+p-1)/(p*(p-1)*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
@@ -205,15 +220,15 @@ for tMV = 10:10:190
         %squareboundFro_Spec(:,s/2-1) = sqrt( 4* sqrt( (1+k*(k*p-2*k+2)/(p*(p-1)*(p-3)))* sum(log(1+diag(G(k+1:n,k+1:n)).^2)) + 2* k*(k+p-1)/(p*(p-1)*(p-3)) * sum(log(1+diag(G(k+1:n,k+1:n))))^2) * sqrt((1+max(1,12*k*(k*p-2*k+2)/(p*(p-1)*(p-3))))* G(k+1,k+1)^2 + max(1,(12*exp(1)^4)*(k+p).^2/((p+1)^3*(p-3))) * sum(log(1+diag(G(k+1:n,k+1:n))))^2));
     end
 
-    BestSqrtTr(tMV/10) = 1/mi * min(squareboundTr');
-    BestSqrtFro(tMV/10) = 1/mi * min(squareboundFro');
-    BestSqrtFro_Spec(tMV/10) = 1/mi * min(squareboundFro_Spec');
-    BoundNoPrec(tMV/10) = 1/mi * sqrt(2/5)*nA;
+    BestSqrtTr((tMV+80)/100) = 1/mi * min(squareboundTr');
+    BestSqrtFro((tMV+80)/100) = 1/mi * min(squareboundFro');
+    BestSqrtFro_Spec((tMV+80)/100) = 1/mi * min(squareboundFro_Spec');
+    BoundNoPrec = 1/mi * sqrt(2./S)*nA;
     % BestSqrtSpec(tMV/10) = min(squareboundSpec');
 
-    BestRkTr(tMV/10) = 1/mi * sum(diag(G(tMV+1:n,tMV+1:n)));
-    BestRkFro(tMV/10) = 1/mi * sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2));
-    BestRkSpec(tMV/10) = 1/mi * G(tMV+1,tMV+1);
+    BestRkTr((tMV+80)/100) = 1/mi * sum(diag(G(tMV+1:n,tMV+1:n)));
+    BestRkFro((tMV+80)/100) = 1/mi * sqrt(sum(diag(G(tMV+1:n,tMV+1:n)).^2));
+    BestRkSpec((tMV+80)/100) = 1/mi * G(tMV+1,tMV+1);
 
 
 end
@@ -221,30 +236,36 @@ end
 
 figure(4)
 subplot('Position', [0.05 0.3 0.4 0.5])
-semilogy(diag(G))
-xlabel('$n$','interpreter','Latex')
-ylabel('eigenvalues')
-title('Eigenvalues of the matrix')
-legend('$\lambda(A)$','interpreter','Latex')
+semilogy(diag(G), 'LineWidth', 5)
+xlabel('$n$','interpreter','Latex','fontsize',18)
+ylabel('eigenvalues','fontsize',18)
+title('Eigenvalues of the matrix','fontsize',18)
+legend('$\lambda(A)$','interpreter','Latex','fontsize',18)
+
+ax = gca;             % 'gca' prende l'asse corrente
+ax.FontSize = 30; 
 
 figure(4)
 subplot('Position', [0.55 0.3 0.4 0.5])
 % semilogy(mvecs,nTr,'-b')
-errorbar(mvecs,nTr,stDevnTr,'-b') 
-hold on
-semilogy(mvecs,BestSqrtTr','-*c')
-hold on
 % semilogy(mvecs,nFro, '-r');
-errorbar(mvecs,nFro,stDevnFro,'-r') 
+errorbar(mvecs,nFro./trA,stDevnFro./trA,'-c', 'LineWidth', 5) 
 hold on
-semilogy(mvecs,BestSqrtFro','-*m')
+%semilogy(mvecs,BestSqrtFro(1:13,1),'--b', 'LineWidth', 5)
+hold on
+errorbar(mvecs,nTr./trA,stDevnTr./trA,'-m', 'LineWidth', 5) 
+hold on
+%semilogy(mvecs,BestSqrtTr(1:13,1)','--r', 'LineWidth', 5)
 hold on
 % semilogy(mvecs,nNoPrec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
-errorbar(mvecs,nNoPrec,stDevnNoPrec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
+errorbar(mvecs(S>1),nNoPrec(S>1)./trA,stDevnNoPrec(S>1)./trA, 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'LineWidth', 5)
 hold on
-semilogy(mvecs,BoundNoPrec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
+%semilogy(mvecs(S>1),BoundNoPrec(S>1)','--', 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'LineWidth', 5)
 set(gca, 'YScale', 'log'); 
-xlabel('MatVecs')
-ylabel('error')
-title('Comparison of the bounds for the two strategies')
-legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'bound (B) spec', 'error (C)', 'bound (C)','fontsize',18)
+xlabel('MatVecs','fontsize',18)
+ylabel('error','fontsize',18)
+title('Comparison of the bounds for the strategies','fontsize',18)
+legend('error (A)', 'bound (A)', 'error (B)','bound (B)', 'error (C)', 'bound (C)','fontsize',18)
+
+ax = gca;             % 'gca' prende l'asse corrente
+ax.FontSize = 30; 

@@ -4,7 +4,7 @@ warning off
 
 T = 30;
 
-decadimento=8;
+decadimento=1;
 
 switch decadimento
 
@@ -26,7 +26,7 @@ switch decadimento
         g = linspace(1,n,n)';
         mi = 1;
         % mi = 1;
-        G = diag(1./(g).^5);
+        G = diag(1./(g).^2);
         A = Q*G*Q';
         % A = G;
 
@@ -62,7 +62,7 @@ switch decadimento
     case 5
         n = 1000;
         mi = 1;
-        alpha = 1; nu = 5/2; % nu = 13/2;
+        alpha = 1; nu = 3/2; % nu = 13/2;
         kernel = @(x,y) sqrt(pi)*((alpha*norm(x-y))^(nu)*besselk(nu,alpha*norm(x-y)))/(2^(nu-1)*alpha^(2*nu)*gamma(nu+0.5));
         data_matrix = randn(1,n);
         
@@ -85,6 +85,7 @@ switch decadimento
         end
 
         [Q,G] = svd(A);
+        G = G/G(1,1);
         G=diag(diag(G));
         A = Q*G*Q'; 
         % A = G;
@@ -190,6 +191,7 @@ for tMV = 10:10:190
         % logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + sqrt(k.^2.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
         % logboundFro(:,s/2-1) = sqrt(sum(diag(G(k+1:n,k+1:n)).^2)) + sqrt(k.* (log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
         % logboundSpec(:,s/2-1) = G(k+1,k+1) + sqrt((log(1+ 2*k/(p-1).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n)))))^2);
+        
         logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + sqrt(k.^2.* (log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2);
         % logboundTr(:,s/2-1) = (sum(diag(G(k+1:n,k+1:n)))) + k.* min ( sqrt((log(1+ k/(p-1) .* sum(diag(G(k+1:n,k+1:n)))))^2), sqrt((log(1 + 2*k/(p-1)).* G(k+1,k+1) + (2*exp(1)^2*(k+p)/(p^2 - 1)) .* sum(diag(G(k+1:n,k+1:n))))^2));
 
@@ -293,28 +295,28 @@ legend('error Nystrom', 'bound Nystrom', 'bound with logarithm', 'square root of
 
 figure(3)
 subplot('Position', [0.05 0.3 0.4 0.5])
-semilogy(diag(G))
-xlabel('$n$','interpreter','Latex')
-ylabel('eigenvalues')
-title('Eigenvalues of the matrix')
-legend('$\lambda(A)$','interpreter','Latex')
+semilogy(diag(G), 'LineWidth', 5)
+xlabel('$n$','interpreter','Latex','fontsize',18)
+ylabel('eigenvalues','fontsize',18)
+title('Eigenvalues of the matrix','fontsize',18)
+legend('$\lambda(A)$','interpreter','Latex','fontsize',18)
 
 figure(3)
 subplot('Position', [0.55 0.3 0.4 0.5])
-semilogy(mvecs,nSpec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8);
+semilogy(mvecs,nSpec, 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'LineWidth', 5);
 hold on
-semilogy(mvecs,BestSpec','-o', 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
+semilogy(mvecs,BestSpec','-o', 'Color', [0.6350 0.0780 0.1840], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'LineWidth', 5)
 hold on
-semilogy(mvecs,LogBoundSpec','-og')
+semilogy(mvecs,LogBoundSpec','-oc', 'LineWidth', 5)
 hold on
-semilogy(mvecs,BestSqrtSpec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'MarkerSize', 8)
+semilogy(mvecs,BestSqrtSpec','-*', 'Color', [0.9290 0.6940 0.1250], 'MarkerFaceColor', [0.6350 0.0780 0.1840], 'LineWidth', 5)
 % hold on
 % semilogy(mvecs,BestRkTr','-*k')
 hold on
-semilogy(mvecs,BestLowerSpec','-dk')
+semilogy(mvecs,BestLowerSpec','-dk', 'LineWidth', 5)
 xlabel('MatVecs')
 ylabel('error')
-title('Comparison of the bounds for Nystrom in Spectral norm')
+title('Comparison of the bounds for Nystrom in Spectral norm','fontsize',18)
 legend('error Nystrom', 'bound Nystrom', 'bound with logarithm', 'square root of square bound Nystrom','best rank k', 'fontsize', 18)
 
 % figure(100)

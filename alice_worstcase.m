@@ -9,7 +9,7 @@ n = 1000;
 Q = randn(n,n); [Q,~] = qr(Q);
 g = linspace(1,n,n)';
 mi = 1;
-sigma = 1e-4;
+sigma = 1e-6;
 nTr = zeros(49,1);
 
 for l=10:10:490
@@ -44,19 +44,19 @@ legend('$\lambda(A)$','interpreter','Latex')
 
 figure(2)
 subplot('Position', [0.05 0.3 0.4 0.5])
-semilogy(diag(G))
-xlabel('$n$','interpreter','Latex')
-ylabel('eigenvalues')
-title('Eigenvalues of the matrix')
-legend('$\lambda(A)$','interpreter','Latex')
+semilogy(diag(G), 'LineWidth', 5)
+xlabel('$n$','fontsize',18,'interpreter','Latex')
+ylabel('eigenvalues','fontsize',18)
+title('Eigenvalues of the matrix','fontsize',18)
+legend('$\lambda(A)$','fontsize',18,'interpreter','Latex')
 
 figure(2)
 subplot('Position', [0.55 0.3 0.4 0.5])
-semilogy(mvecs,nTr'./BestRkTr,'-db')
+semilogy(mvecs,nTr'./BestRkTr,'-db', 'LineWidth', 5)
 hold on
-semilogy(mvecs,1./denom,'-dg')
+semilogy(mvecs,1./denom,'-dg', 'LineWidth', 5)
 hold on
-xlabel('MatVecs')
-ylabel('error')
-title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$', 'Interpreter','latex')
-legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|\sigma I \|_*}$', 'Fontsize', 25, 'interpreter', 'Latex')
+xlabel('MatVecs','fontsize',18)
+ylabel('error','fontsize',18)
+title('Comparison of the bounds for Nystrom in Trace Norm for $\sigma = 10^{-6}$','fontsize',18, 'Interpreter','latex')
+legend('$\frac{\|\Lambda-\Lambda_{k,p}\|_*}{\|\Lambda-\Lambda_{k+p}\|_*}$', '$\frac{k+p}{1+3(k+p)\|\sigma I \|_*}$', 'Fontsize', 18, 'interpreter', 'Latex')
